@@ -1,0 +1,37 @@
+{
+  "name": "lost-found-web-portal",
+  "version": "1.0.0",
+  "description": "Student ID Lost and Found Portal",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js",
+    "init-db": "node scripts/init-database.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "mysql2": "^3.6.0",
+    "bcryptjs": "^2.4.3",
+    "jsonwebtoken": "^9.0.2",
+    "multer": "^1.4.5-lts.1",
+    "sharp": "^0.32.6",
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "express-rate-limit": "^6.10.0",
+    "express-validator": "^7.0.1",
+    "helmet": "^7.0.0",
+    "uuid": "^9.0.1",
+    "ejs": "^3.1.9"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/blessings-chisanga/lost-found-portal.git"
+  },
+  "keywords": ["lost-found-portal", "student-portal", "express", "mysql"],
+  "author": "Blessings Chisanga",
+  "license": "ISC",
+  "homepage": "https://github.com/blessings-chisanga/lost-found-portal#readme"
+}

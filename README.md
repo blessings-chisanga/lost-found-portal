@@ -1,22 +1,25 @@
-
-# 🧭 Lost & Found Web App
+# 🧭 Lost-Found-Web-Portal
 
 A modern, full-stack **Lost and Found** application designed for university campuses. This app helps users report, find, and reclaim lost items with ease.
 
 ## 🔧 Tech Stack
 
 **Frontend:**
-- React.js
+
+- Vanilla JavaScript
 - Google Maps API (location tagging)
 
 **Backend:**
+
 - Node.js
 - Express.js (Framework)
 
 **Database:**
-- PostgreSQL
+
+- Mysql
 
 **Authentication & Storage:**
+
 - Firebase Authentication
 - Firebase Cloud Storage
 - Firebase Cloud Messaging (for notifications)
@@ -29,5 +32,3 @@ A modern, full-stack **Lost and Found** application designed for university camp
 - 🖼️ **Image Uploads** via Firebase Storage.
 - 🔔 **Push Notifications** for updates or matches.
 - 🗃️ **Item Management Dashboard** for users and admins.
-
-
