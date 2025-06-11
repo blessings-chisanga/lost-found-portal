@@ -2,7 +2,7 @@
   "name": "lost-found-web-portal",
   "version": "1.0.0",
   "description": "Student ID Lost and Found Portal",
-  "main": "server.js",
+  "main": "app.js",
   "type": "module",
   "scripts": {
     "start": "node server.js",
