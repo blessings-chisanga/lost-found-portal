@@ -7,21 +7,22 @@
 </head>
 <body>
     <header>
+        <h1>Lost & Found Web Portal</h1>
         <nav>
             <ul>
                 <li>
-                <button><a href="/home.html">home</a></button> 
+                <button><a href="/login.html">log in</a></button>
                 </li>
                 <li>
-                <button><a href="/login.html">login</a></button>
-                </li>
-                <li>
-                <button><a href="/signup.html">signup</a></button>
+                <button><a href="/signup.html">sign up</a></button>
                 </li>
             </ul>
         </nav>
     </header>
-    <h1>Lost Items</h1>
+    <div class="headings">
+        <h1>Lost Items</h1> 
+    </div>
+    
     <ul id="lost-items"></ul>
 
     <script>
@@ -33,6 +34,7 @@
                 const list = document.getElementById('lost-items');
                 data.forEach(lostId => {
                     const li = document.createElement('li');
+                    li.className = "list";
                     li.textContent = `${lostId.student_id} — name ${lostId.student_name} found at ${lostId.found_location} on ${lostId.found_date} status ${lostId.status}`;
                     list.appendChild(li);
                 });

@@ -1,54 +1,82 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
+  <head>
+    <meta charset="UTF-8" />
     <title>Lost Items</title>
-    <link rel="stylesheet" href="/styles.css">
-</head>
-<body>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
     <header>
-        <nav>
-            <ul>
-                <li>
-                <button><a href="/home.html">home</a></button> 
-                </li>
-                <li>
-                <button><a href="/login.html">login</a></button>
-                </li>
-                <li>
-                <button><a href="/signup.html">signup</a></button>
-                </li>
-            </ul>
-        </nav>
+      <nav>
+        <ul>
+          <li>
+            <button><a href="/home.html">home</a></button>
+          </li>
+          <li>
+            <button><a href="/login.html">log in</a></button>
+          </li>
+        </ul>
+      </nav>
     </header>
     <h1>Signup</h1>
     <form action="/signup">
-        <h2>Signup</h2>
-        <label for="studentID">Unza Student ID</label>
-        <input type="text" name="firstName"/>
-        <div class="studentID error"></div>
+      <h2>Signup</h2>
+      <label for="studentID">Unza Student ID</label>
+      <input type="text" name="studentID" />
+      <div class="studentID error"></div>
 
-        <label for="firstName">First Name</label>
-        <input type="text" name="firstName"/>
-        <div class="firstName error"></div>
+      <label for="firstName">First Name</label>
+      <input type="text" name="firstName" />
+      <div class="firstName error"></div>
 
-        <label for="lastName">Last Name</label>
-        <input type="text" name="lastName"  />
-        <div class="lastName error"></div>
+      <label for="lastName">Last Name</label>
+      <input type="text" name="lastName" />
+      <div class="lastName error"></div>
 
-        <label for="email">Email</label>
-        <input type="text" name="email"/>
-        <div class="email error"></div>
+      <label for="email">Email</label>
+      <input type="text" name="email" />
+      <div class="email error"></div>
 
-        <label for="phone">Phone</label>
-        <input type="text" name="phone"/>
-        <div class="phone error"></div>
+      <label for="phone">Phone</label>
+      <input type="text" name="phone" />
+      <div class="phone error"></div>
 
-        <label for="password">Password</label>
-        <input type="password" name="password" />
-        <div class="password error"></div>
-        <button>Signup</button>
+      <label for="password">Password</label>
+      <input type="password" name="password" />
+      <div class="password error"></div>
+      <button>Signup</button>
     </form>
-</body>
-<footer>Copyright 2025 Student Library Portal</footer>
+    <script>
+      const form = document.querySelector("form");
+      form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const student_id = form.studentID.value;
+        const firstName = form.firstName.value;
+        const lastName = form.lastName.value;
+        const email = form.email.value;
+        const phone = form.phone.value;
+        const password = form.password.value;
+
+        //console.log(student_id, firstName, lastName, email, phone, password);
+        try {
+          const result = await fetch("/signup", {
+            method: "POST",
+            body: JSON.stringify({
+              student_id: student_id,
+              firstName: firstName,
+              lastName: lastName,
+              email: email,
+              phone: phone,
+              password: password,
+            }),
+            headers: { "content-type": "application/json" },
+          });
+        } catch (error) {
+          console.log(err);
+        }
+      
+      });
+    </script>
+  </body>
+  <footer>Copyright 2025 Student Library Portal</footer>
 </html>

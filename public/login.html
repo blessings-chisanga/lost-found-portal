@@ -13,24 +13,31 @@
             <button><a href="/home.html">home</a></button> 
             </li>
             <li>
-            <button><a href="/login.html">login</a></button>
-            </li>
-            <li>
-            <button><a href="/signup.html">signup</a></button>
+            <button><a href="/signup.html">sign up</a></button>
             </li>
         </nav>
     </header>
     <h1>Login</h1>
     <form action="/signup">
         <h2>Login</h2>
-        <label for="studentID">Unza Student ID</label>
-        <input type="text" name="studentID"  />
-        <div class="studentID error"></div>
+        <label for="email">Email</label>
+        <input type="email" name="email"  />
+        <div class="email error"></div>
         <label for="password">Password</label>
         <input type="password" name="password"  />
         <div class="password error"></div>
         <button>login</button>
     </form>
+    <script>
+        const form = document.querySelector('form');
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+
+            const email = form.email.value;
+            const password = form.password.value;
+            console.log(email, password);
+        })
+    </script>
 </body>
 <footer>Copyright 2025 Student Library Portal</footer>
 </html>

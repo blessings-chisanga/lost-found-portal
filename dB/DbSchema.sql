@@ -79,9 +79,9 @@ INSERT INTO admins (username, email, password_hash, full_name, role) VALUES
 ('Blesings', 'BlessingsChisanga@cs.unza.zm', '$2b$10$hash_here', 'Library Administrator', 'admin');
 
 INSERT INTO students (student_id, first_name, last_name, email, password_hash) VALUES
-('STU001', 'John', 'Doe', 'john.doe@student.edu', '$2b$10$hash_here'),
-('STU002', 'Jane', 'Smith', 'jane.smith@student.edu', '$2b$10$hash_here');
+('2021379566', 'John', 'Doe', 'john.doe@student.edu', '$2b$10$hash_here'),
+('2021379655', 'Jane', 'Smith', 'jane.smith@student.edu', '$2b$10$hash_here');
 
 INSERT INTO lost_ids (student_id, student_name, id_type, found_date, found_location, description, status, added_by) VALUES
-('STU001', 'John Doe', 'student_id', '2024-06-01', 'Library Reading Room', 'Blue student ID card', 'available', 1),
-('STU002', 'Jane Smith', 'government_issued', '2024-06-03', 'Computer Lab', 'Government NRC', 'available', 1);
+('2021379566', 'John Doe', 'student_id', '2024-06-01', 'Library Reading Room', 'Blue student ID card', 'available', 1),
+('2021379655', 'Jane Smith', 'government_issued', '2024-06-03', 'Computer Lab', 'Government NRC', 'available', 1);

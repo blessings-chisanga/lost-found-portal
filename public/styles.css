@@ -21,13 +21,14 @@ a{
 }
 nav{
   display: flex;
-  justify-content: space-between;
-  align-items: flex-end;
+  justify-content: flex-end;
   margin-bottom: 80px;
+  width: 90%;
 }
 nav ul{
   display: flex;
-  align-items: right;
+  justify-content: flex-end;
+  gap: 15px;
 }
 
 nav li{
@@ -65,6 +66,32 @@ form:hover {
   box-shadow: 0 12px 24px rgba(0, 0, 0, 0.2); /* Deeper shadow */
 }
 
+.headings{
+  width: auto;
+  margin-bottom: 10px;
+  padding: 10px;
+  box-shadow: 1px 2px 3px rgba(0,0,0,0.1);
+  border-radius: 10px;
+  background: white;
+  
+}
+
+
+.list{
+  width: auto;
+  margin-bottom: 5px;
+  padding: 10px;
+  box-shadow: 1px 2px 3px rgba(0,0,0,0.1);
+  border-radius: 10px;
+  background: white;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.list:hover{
+  transform: scale(1.02);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.2); /* Deeper shadow */ 
+}
+
 input{
   padding: 10px 12px;
   border-radius: 4px;
@@ -100,7 +127,7 @@ button:hover{
 }
 header{
   display: flex;
-  align-items: center;
+  align-items: left;
 }
 header img{
   width: 250px;
