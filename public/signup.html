@@ -22,34 +22,42 @@
     <form action="/signup">
       <h2>Signup</h2>
       <label for="studentID">Unza Student ID</label>
-      <input type="text" name="studentID" />
-      <div class="studentID error"></div>
+      <input type="text" name="studentID"/>
+      <div id="student_id" class="error"></div>
 
       <label for="firstName">First Name</label>
-      <input type="text" name="firstName" />
-      <div class="firstName error"></div>
+      <input type="text" name="firstName"/>
+      <div id="firstName" class="error"></div>
 
       <label for="lastName">Last Name</label>
-      <input type="text" name="lastName" />
-      <div class="lastName error"></div>
+      <input type="text" name="lastName"/>
+      <div id="lastName" class="error"></div>
 
       <label for="email">Email</label>
-      <input type="text" name="email" />
-      <div class="email error"></div>
+      <input type="text" placeholder="JohnDoe@gmail" name="email"/>
+      <div id="email" class="error"></div>
 
       <label for="phone">Phone</label>
-      <input type="text" name="phone" />
-      <div class="phone error"></div>
+      <input type="text" name="phone"/>
+      <div id="phone" class="error"></div>
 
       <label for="password">Password</label>
-      <input type="password" name="password" />
-      <div class="password error"></div>
+      <input type="password" name="password"/>
+      <div id="password" class="error"></div>
       <button>Signup</button>
     </form>
     <script>
       const form = document.querySelector("form");
+
       form.addEventListener("submit", async (e) => {
         e.preventDefault();
+
+        //Clear all errors
+        document.querySelectorAll('.error').forEach(div => {
+            div.textContent = '';
+       });
+
+        // Get form values
         const student_id = form.studentID.value;
         const firstName = form.firstName.value;
         const lastName = form.lastName.value;
@@ -57,24 +65,55 @@
         const phone = form.phone.value;
         const password = form.password.value;
 
-        //console.log(student_id, firstName, lastName, email, phone, password);
         try {
-          const result = await fetch("/signup", {
+          // Send data to the server
+          const response = await fetch("/signup", {
             method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
             body: JSON.stringify({
-              student_id: student_id,
-              firstName: firstName,
-              lastName: lastName,
-              email: email,
-              phone: phone,
-              password: password,
+              student_id,
+              firstName,
+              lastName,
+              email,
+              phone,
+              password,
             }),
-            headers: { "content-type": "application/json" },
           });
+
+          const data = await response.json();
+          console.log("server response:", data);
+
+           if (data.errors && Array.isArray(data.errors)) {
+            //Error occured in validator middleware
+            data.errors.forEach((err) => {
+
+              //dynamic programming lol
+              const errorDiv = document.getElementById(err.parameter);
+                if (errorDiv) {
+                   errorDiv.textContent = err.message;
+                }
+
+              console.error(`Validation error in ${err.parameter}: ${err.message}`);
+              alert(`${err.message}`);
+            });
+
+          } else if (!response.ok) {
+            //Errror occured in Signup route
+            console.error("Signup failed", data.message);
+            alert(data.message);
+
+          } else {
+           //Successful signup
+            console.log("Signup successful:", data.message);
+            alert("Signup successful!");
+            form.reset();
+          }
+        
         } catch (error) {
-          console.log(err);
+          console.error("Request error:", error.message);
         }
-      
       });
     </script>
   </body>

@@ -42,10 +42,10 @@ export async function signup_post(req, res) {
 
     res
       .status(201)
-      .json({ success: true, message: "Student registered successfully" });
+      .json({success: true, message: "Student registered successfully" });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ success: false, message: "Internal server error" });
+    res.status(500).json({success: false, message: "Internal server error" });
   }
 }
 
