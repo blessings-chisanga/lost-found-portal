@@ -18,8 +18,8 @@
         </nav>
     </header>
     <h1>Login</h1>
-    <form action="/signup">
-        <h2>Login</h2>
+    <form action="/login">
+        <h2>Login</h2> 
         <label for="email">Email</label>
         <input type="email" name="email"  />
         <div class="email error"></div>
@@ -30,14 +30,27 @@
     </form>
     <script>
         const form = document.querySelector('form');
-        form.addEventListener('submit', (e) => {
+        form.addEventListener('submit', async (e) => {
             e.preventDefault();
 
             const email = form.email.value;
             const password = form.password.value;
-            console.log(email, password);
+
+            const response = await fetch("/login", {
+                method: "POST",
+                headers: {
+                "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                email,
+                password
+                })
+            });
+
+          const resp = await response.json()
+          console.log(resp);
         })
     </script>
 </body>
-<footer>Copyright 2025 Student Library Portal</footer>
+<footer>UNZA Student Portal/ Copyright 2025 </footer>
 </html>

@@ -35,14 +35,20 @@ export async function signup_post(req, res) {
     }
 
     // Send to Database
-    await pool.execute(
+    const [result] = await pool.execute(
       "INSERT INTO students (student_id, first_name, last_name, email, phone, password_hash) VALUES (?, ?, ?, ?, ?, ?)",
       [student_id, firstName, lastName, email, phone, hashedPassword]
     );
 
+    console.log(result);
     res
       .status(201)
-      .json({success: true, message: "Student registered successfully" });
+      .json({
+        success: true, 
+        message: "Student registered successfully",
+        id: result.insertId
+      });
+
   } catch (error) {
     console.error(error);
     res.status(500).json({success: false, message: "Internal server error" });
@@ -50,9 +56,17 @@ export async function signup_post(req, res) {
 }
 
 export function login_post(req, res) {
-  const { email, name } = req.body;
-  console.log(name + " " + email);
-  res.send("you are loged in");
+  const { email, password } = req.body;
+  console.log(password + " " + email);
+  res.status(200).json({
+    message: "You are logged in"
+  })
+
+  //Check if either email exisits in database
+      //if not send back error
+  //if exists, get the passowrd sent, hash it and compare with the password in the database
+      //if not match, send back error
+  //if match send back jwt with success message 
 }
 
 export default {

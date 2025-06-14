@@ -1,50 +1,50 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
+  <head>
+    <meta charset="UTF-8" />
     <title>Lost Items</title>
-    <link rel="stylesheet" href="/styles.css">
-</head>
-<body>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
     <header>
-        <h1>Lost & Found Web Portal</h1>
-        <nav>
-            <ul>
-                <li>
-                <button><a href="/login.html">log in</a></button>
-                </li>
-                <li>
-                <button><a href="/signup.html">sign up</a></button>
-                </li>
-            </ul>
-        </nav>
+      <h1>Lost & Found Web Portal</h1>
+      <nav>
+        <ul>
+          <li>
+            <button><a href="/login.html">log in</a></button>
+          </li>
+          <li>
+            <button><a href="/signup.html">sign up</a></button>
+          </li>
+        </ul>
+      </nav>
     </header>
     <div class="headings">
-        <h1>Lost Items</h1> 
+      <h1>Lost Items</h1>
     </div>
-    
+
     <ul id="lost-items"></ul>
 
     <script>
-        async function fetchLostIds() {
-            try {
-                const response = await fetch('http://localhost:3000/fetchIds');
-                const data = await response.json();
+      async function fetchLostIds() {
+        try {
+          const response = await fetch("http://localhost:3000/fetchIds");
+          const data = await response.json();
 
-                const list = document.getElementById('lost-items');
-                data.forEach(lostId => {
-                    const li = document.createElement('li');
-                    li.className = "list";
-                    li.textContent = `${lostId.student_id} — name ${lostId.student_name} found at ${lostId.found_location} on ${lostId.found_date} status ${lostId.status}`;
-                    list.appendChild(li);
-                });
-            } catch (err) {
-                console.error('Error fetching items:', err);
-            }
+          const list = document.getElementById("lost-items");
+          data.forEach((lostId) => {
+            const li = document.createElement("li");
+            li.className = "list";
+            li.textContent = `${lostId.student_id} — name ${lostId.student_name} found at ${lostId.found_location} on ${lostId.found_date} status ${lostId.status}`;
+            list.appendChild(li);
+          });
+        } catch (err) {
+          console.error("Error fetching items:", err);
         }
+      }
 
-        fetchLostIds();
+      fetchLostIds();
     </script>
-</body>
-<footer>Copyright 2025 Student Library Portal</footer>
+  </body>
+  <footer>UNZA Student Portal/ Copyright 2025</footer>
 </html>
