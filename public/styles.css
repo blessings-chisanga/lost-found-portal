@@ -13,8 +13,16 @@ h1, h2, h3, h4, ul, li, a, p, input, label, button, div, footer{
   font-family: 'Quicksand', sans-serif;
   color: #444;
 }
-ul{
-  list-style-type: none;
+
+.lost-items-container{
+  border-radius: 5px;
+  background-color: #444444;
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  row-gap: 1rem;
+  column-gap: 1rem;
+  padding: 10px;
 }
 a{
   text-decoration: none;
@@ -24,6 +32,9 @@ nav{
   justify-content: flex-end;
   margin-bottom: 80px;
   width: 90%;
+}
+ul{
+  list-style: none;
 }
 nav ul{
   display: flex;
@@ -67,19 +78,24 @@ form:hover {
 }
 
 .headings{
-  width: auto;
+  width: 100%;
   margin-bottom: 10px;
   padding: 10px;
   box-shadow: 1px 2px 3px rgba(0,0,0,0.1);
-  border-radius: 10px;
+  border-radius: 5px;
   background: white;
   
 }
 
+.id-image{
+  width: 400px;
+  height: 300px;
+  border-radius: 5px;
+}
 
-.list{
-  width: auto;
-  margin-bottom: 5px;
+.card{
+  width: 400px;
+  height: 450px;
   padding: 10px;
   box-shadow: 1px 2px 3px rgba(0,0,0,0.1);
   border-radius: 10px;
@@ -87,7 +103,7 @@ form:hover {
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
-.list:hover{
+.card:hover{
   transform: scale(1.02);
   box-shadow: 0 12px 24px rgba(0, 0, 0, 0.2); /* Deeper shadow */ 
 }
@@ -176,3 +192,4 @@ footer{
   margin-top: 120px;
   color: #808080;
 }
+

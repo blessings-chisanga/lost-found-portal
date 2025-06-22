@@ -19,24 +19,36 @@
         </ul>
       </nav>
     </header>
-    <div class="headings">
-      <h1>Lost Items</h1>
-    </div>
+    <main>
+      <div class="headings">
+        <h1>Unclaimed Ids</h1>
+      </div>
+      <div class="lost-items-container">
 
-    <ul id="lost-items"></ul>
-
+      </div>
+    </main>
     <script>
       async function fetchLostIds() {
         try {
           const response = await fetch("http://localhost:3000/fetchIds");
           const data = await response.json();
 
-          const list = document.getElementById("lost-items");
+          const cardContainer = document.querySelector('.lost-items-container');
           data.forEach((lostId) => {
             const li = document.createElement("li");
-            li.className = "list";
-            li.textContent = `${lostId.student_id} — name ${lostId.student_name} found at ${lostId.found_location} on ${lostId.found_date} status ${lostId.status}`;
-            list.appendChild(li);
+            const card = document.createElement("div");
+            card.innerHTML = `
+                    <img src="/ids/license-1.jpeg" class="id-image">
+                    <div class="info">
+                      <h3>Name: ${lostId.student_name}</h3>
+                      <p>Student Id: ${lostId.student_id}</p>
+                      <p>Found at: ${lostId.found_location}</p>
+                      <p>Found on: ${lostId.found_date}</p>
+                      <p>Status: ${lostId.status}</p>
+                    </div>
+            `;
+            card.className = "card";
+            cardContainer.appendChild(card);
           });
         } catch (err) {
           console.error("Error fetching items:", err);

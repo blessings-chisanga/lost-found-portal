@@ -62,11 +62,12 @@ export function login_post(req, res) {
     message: "You are logged in"
   })
 
-  //Check if either email exisits in database
+  //Check if email exisits in database
       //if not send back error
-  //if exists, get the passowrd sent, hash it and compare with the password in the database
+  //if exists, get the passoword sent, hash it and compare with the password in the database
       //if not match, send back error
   //if match send back jwt with success message 
+    //User is logged in at this point, as long as they have the jwt they are authorized 
 }
 
 export default {

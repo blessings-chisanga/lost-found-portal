@@ -96,18 +96,16 @@
                 }
 
               console.error(`Validation error in ${err.parameter}: ${err.message}`);
-              alert(`${err.message}`);
             });
 
           } else if (!response.ok) {
             //Errror occured in Signup route
             console.error("Signup failed", data.message);
-            alert(data.message);
+           
 
           } else {
            //Successful signup
             console.log("Signup successful:", data.message);
-            alert("Signup successful!");
             form.reset();
           }
         
