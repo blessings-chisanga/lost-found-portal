@@ -15,8 +15,9 @@ h1, h2, h3, h4, ul, li, a, p, input, label, button, div, footer{
 }
 
 .lost-items-container{
+  font-family: 'Quicksand', sans-serif;
   border-radius: 5px;
-  background-color: #444444;
+  background-color: #d6e0e9;
   width: 100%;
   display: grid;
   grid-template-columns: repeat(3, 1fr);

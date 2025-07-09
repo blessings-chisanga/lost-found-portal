@@ -14,6 +14,7 @@ export function login_get(req, res) {
   res.sendFile(path.join(__dirname, "../public/login.html"));
 }
 
+//Signing up a user
 export async function signup_post(req, res) {
   //middleware executes before this, so input is already saitized
   const { student_id, firstName, lastName, email, phone, password } =
