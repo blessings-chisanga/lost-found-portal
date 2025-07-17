@@ -1,0 +1,159 @@
+﻿WATERFALL TASK BREAKDOWN
+
+Phase 1: Project Setup & Foundation
+1.1 Dependencies Installation
+1.2 Development Dependencies
+
+Phase 2: Database Design & Setup
+2.1 Design the database schema
+
+2.2 Database Implementation
+
+ Create database connection module
+ Create database initialization script
+ Add sample data for testing
+
+Phase 3: Backend API Development
+3.1 Authentication System
+
+ Create JWT configuration and utilities
+ Implement user registration endpoint
+ Implement user login endpoint
+ Implement JWT middleware for protected routes
+ Create role-based authorization middleware (student/admin)
+
+3.2 Lost ID Management API
+
+ Create endpoint to add new lost ID (admin action)
+ Create endpoint to get all lost IDs (public/student)
+ Create endpoint to search lost IDs by name
+ Create endpoint to search lost IDs by student ID
+ Create endpoint to get single lost ID details
+ Create endpoint to update lost ID status (admin action)
+ Implement image upload functionality for ID photos (admin action)
+
+
+
+
+
+
+
+
+3.3 Claims Management API
+
+ Create endpoint to submit claim (authenticated students)
+ Create endpoint to get user's own claims (authenticated   students)
+ Create endpoint to get all claims (admin action)
+ Create endpoint to approve/reject claims (admin action)
+ Create endpoint to get claim details
+ Implement the claim validation logic
+
+3.4 Admin Dashboard API
+
+ Create endpoint to get dashboard statistics
+ Create endpoint to get recent activities
+ Create endpoint to export claims data
+ Create endpoint to manage user accounts
+
+Phase 4: Frontend Development
+4.1 HTML Structure
+
+ Create base HTML template with navigation
+ Create login/register pages
+ Create main dashboard/browse page
+ Create search results page
+ Create claim submission form
+ Create user profile/claims page
+ Create admin dashboard
+ Create admin claims review page
+
+4.2 CSS Styling
+ Style navigation and header
+ Style authentication forms
+ Style ID cards display grid
+ Style search and filter components
+ Style claim forms and status indicators
+ Style admin dashboard components
+
+
+
+
+
+
+4.3 JavaScript Frontend Logic
+
+ Implement authentication state management
+ Create login/logout functionality
+ Implement ID browsing and display
+ Create search functionality (name and ID)
+ Create claim submission functionality
+ Implement form validation
+ Create user claims tracking
+ Implement admin dashboard functionality
+ Create claim review and processing features
+
+
+Phase 5: Security & Validation
+5.1 Input Validation
+
+ Implement server-side validation for all endpoints
+ Add client-side form validation
+ Sanitize user inputs to prevent XSS
+ Validate file uploads (type, size, security)
+
+5.2 Security Measures
+
+ Implement rate limiting for API endpoints
+ Add CORS configuration
+ Implement proper error handling (don't expose sensitive info)
+ Add input sanitization middleware
+ Implement secure file upload validation
+
+5.3 Authentication Security
+
+ Implement secure JWT token expiration
+ Add refresh token functionality
+ Implement proper password hashing
+ Add account lockout after failed attempts
+ Implement session management
+ admin security log view
+
+
+
+
+
+Phase 6: Features & Enhancements
+6.2 User Experience
+ Implement error messages and success notifications
+ Create responsive mobile design
+
+6.3 Admin Features
+ Create admin user management
+ Add bulk import functionality for lost IDs
+ Create reporting and analytics
+
+Phase 7: Testing & Quality Assurance of software
+7.1 Testing
+
+ Create unit tests for API endpoints
+ Test authentication and authorization
+ Test file upload functionality
+ Test search and filtering
+ Test claim submission and processing
+ Perform cross-browser testing
+ Test responsive design on various devices
+
+7.2 Error Handling
+ Create user-friendly error messages
+ Test error scenarios and possible edge cases
+
+Phase 8: Deployment & Production
+8.1 Deploy Web application on a VPS
+
+Phase 9: Documentation
+9.1 Documentation
+ Create API documentation
+ Write user manual
+ Create admin guide
+
+

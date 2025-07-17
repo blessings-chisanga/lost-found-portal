@@ -7,33 +7,34 @@
 </head>
 <body>
     <header>
+        <h1>Welcome to UNZA Lost & Found Web Portal</h1>
         <nav>
             <ul>
             <li>
-            <button><a href="/home.html">home</a></button> 
+            <button><a href="/UserHome.html">home</a></button> 
             </li>
             <li>
             <button><a href="/signup.html">sign up</a></button>
             </li>
         </nav>
     </header>
-    <h1>Login</h1>
+    <h3>Log In to proceed!</h3>
     <form action="/login">
         <h2>Login</h2> 
-        <label for="email">Email</label>
-        <input type="email" name="email"  />
-        <div class="email error"></div>
+        <label for="email">Unza Student ID</label>
+        <input type="number" name="student_id"  />
+        <div class="student_id error"></div>
         <label for="password">Password</label>
         <input type="password" name="password"  />
         <div class="password error"></div>
-        <button>login</button>
+        <button>Log In</button>
     </form>
     <script>
         const form = document.querySelector('form');
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
 
-            const email = form.email.value;
+            const student_id = form.student_id.value;
             const password = form.password.value;
 
             const response = await fetch("/login", {
@@ -47,8 +48,8 @@
                 })
             });
 
-          const resp = await response.json()
-          console.log(resp);
+          const res = await response.json()
+          console.log(res);
         })
     </script>
 </body>

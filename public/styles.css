@@ -7,11 +7,19 @@ body{
   letter-spacing: 1px;
   background: #d6e0e9;
 }
-h1, h2, h3, h4, ul, li, a, p, input, label, button, div, footer{
+
+h1, h2, h3, h4, ul, li, p, input, label, div, footer{
   margin: 0;
   padding: 0;
   font-family: 'Quicksand', sans-serif;
   color: #444;
+}
+
+a {
+  color: white;
+  font-family: 'Quicksand', sans-serif;
+  font-weight: 700;
+  text-decoration: none;
 }
 
 .lost-items-container{
@@ -25,9 +33,7 @@ h1, h2, h3, h4, ul, li, a, p, input, label, button, div, footer{
   column-gap: 1rem;
   padding: 10px;
 }
-a{
-  text-decoration: none;
-}
+
 nav{
   display: flex;
   justify-content: flex-end;
@@ -96,7 +102,7 @@ form:hover {
 
 .card{
   width: 400px;
-  height: 450px;
+  height: 500px;
   padding: 10px;
   box-shadow: 1px 2px 3px rgba(0,0,0,0.1);
   border-radius: 10px;
@@ -121,11 +127,13 @@ label{
   margin: 20px 0 10px;
 }
 button{
+  color: #fdfbf2;
   margin-top: 10px;
-  border-radius: 36px;
-  background: #ef9675;
+  border-radius: 5px;
+  background: #559617;
   border:0;
-  text-transform: uppercase;
+  font-family: 'Quicksand', sans-serif;
+  box-shadow: 1 2px 3px rgba(0, 0, 0, 0.2);
   font-weight: 700;
   font-size: 0.8em;
   display: block;
@@ -134,7 +142,7 @@ button{
   transition: background 0.3s ease, color 0.3s ease;
 }
 button:hover{
-  background: #e47a53;
+  background: #3e6e10;
 }
 .error{
   color: #ff0099;

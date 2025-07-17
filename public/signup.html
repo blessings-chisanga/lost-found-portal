@@ -7,10 +7,11 @@
   </head>
   <body>
     <header>
+      <h1>UNZA Lost & Found Web Portal</h1>
       <nav>
         <ul>
           <li>
-            <button><a href="/home.html">home</a></button>
+            <button><a href="/UserHome.html">home</a></button>
           </li>
           <li>
             <button><a href="/login.html">log in</a></button>
@@ -18,33 +19,33 @@
         </ul>
       </nav>
     </header>
-    <h1>Signup</h1>
+    <h3>New here? Signup!</h3>
     <form action="/signup">
       <h2>Signup</h2>
       <label for="studentID">Unza Student ID</label>
-      <input type="text" name="studentID"/>
+      <input type="text" name="studentID" />
       <div id="student_id" class="error"></div>
 
       <label for="firstName">First Name</label>
-      <input type="text" name="firstName"/>
+      <input type="text" name="firstName" />
       <div id="firstName" class="error"></div>
 
       <label for="lastName">Last Name</label>
-      <input type="text" name="lastName"/>
+      <input type="text" name="lastName" />
       <div id="lastName" class="error"></div>
 
       <label for="email">Email</label>
-      <input type="text" placeholder="JohnDoe@gmail" name="email"/>
+      <input type="text" placeholder="JohnDoe@gmail" name="email" />
       <div id="email" class="error"></div>
 
       <label for="phone">Phone</label>
-      <input type="text" name="phone"/>
+      <input type="text" name="phone" />
       <div id="phone" class="error"></div>
 
       <label for="password">Password</label>
-      <input type="password" name="password"/>
+      <input type="password" name="password" />
       <div id="password" class="error"></div>
-      <button>Signup</button>
+      <button>Sign Up</button>
     </form>
     <script>
       const form = document.querySelector("form");
@@ -53,9 +54,9 @@
         e.preventDefault();
 
         //Clear all errors
-        document.querySelectorAll('.error').forEach(div => {
-            div.textContent = '';
-       });
+        document.querySelectorAll(".error").forEach((div) => {
+          div.textContent = "";
+        });
 
         // Get form values
         const student_id = form.studentID.value;
@@ -85,30 +86,31 @@
           const data = await response.json();
           console.log("server response:", data);
 
-           if (data.errors && Array.isArray(data.errors)) {
+          if (data.errors && Array.isArray(data.errors)) {
             //Error occured in validator middleware
             data.errors.forEach((err) => {
-
               //Some dynamic programming lol
               const errorDiv = document.getElementById(err.parameter);
-                if (errorDiv) {
-                   errorDiv.textContent = err.message;
-                }
+              if (errorDiv) {
+                errorDiv.textContent = err.message;
+              }
 
-              console.error(`Validation error in ${err.parameter}: ${err.message}`);
+              console.error(
+                `Validation error in ${err.parameter}: ${err.message}`
+              );
             });
-
           } else if (!response.ok) {
             //Errror occured in Signup route
             console.error("Signup failed", data.message);
-           
-
+            alert(data.message);
           } else {
-           //Successful signup
+            //Successful signup
             console.log("Signup successful:", data.message);
-            form.reset();
+            //form.reset();
+            if (data.id) {
+              location.assign("/UserHome.html");
+            }
           }
-        
         } catch (error) {
           console.error("Request error:", error.message);
         }
