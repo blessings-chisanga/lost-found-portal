@@ -3,9 +3,6 @@ import bcrypt from "bcryptjs";
 import path from "path";
 import { fileURLToPath } from "url";
 import jwt from "jsonwebtoken";
-import cookieParser from "cookie-parser";
-import dotenv from "dotenv";
-dotenv.config();
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -111,9 +108,16 @@ export async function login_post(req, res) {
     }
 }
 
+export function logout_get(req, res) {
+  res.cookie("jwt", "", { maxAge: 1 }); // Set cookie to expire immediately
+  res.redirect("/login.html");          // Redirect to login page or homepage
+}
+
+
 export default {
   signup_get,
   signup_post,
   login_get,
   login_post,
+  logout_get,
 };

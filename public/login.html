@@ -22,9 +22,9 @@
     <form>
         <h2>Login</h2> 
         <label for="email">Unza Student ID</label>
-        <input type="number" name="student_id"  />
+        <input type="number" placeholder="202xxxxxxx" name="student_id"  />
         <label for="password">Password</label>
-        <input type="password" name="password"  />
+        <input type="password" placeholder="Your Password" name="password" />
         <div class="error"></div>
         <button>Log In</button>
     </form>
@@ -64,7 +64,7 @@
                 if (!response.ok) {
                     console.log("Login Error", res.message );
                     errordiv.textContent = res.message || "login failed";
-                    
+
                     submitBtn.disabled = false;
                     submitBtn.textContent = "Log In";
 

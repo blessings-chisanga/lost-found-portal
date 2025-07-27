@@ -1,11 +1,14 @@
 //Necessary Imports
-import pool from "./dB/db.js";
+//import pool from "./dB/db.js";
 import express from "express";
 import cors from "cors";
 import authRoutes from "./routes/authRoutes.js";
+import userRoutes from "./routes/userRoutes.js"
 import path from "path";
 import { fileURLToPath } from "url";
 import cookieParser from "cookie-parser";
+import dotenv from "dotenv"
+dotenv.config()
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -19,8 +22,10 @@ app.use(express.static("uploads"));
 app.use(cookieParser());
 
 app.use(authRoutes);
+app.use(userRoutes);
 
 //Routes
+/*
 app.get("/fetchIds", async (req, res) => {
   try {
     const [rows] = await pool.query("SELECT * FROM lost_ids");
@@ -31,6 +36,7 @@ app.get("/fetchIds", async (req, res) => {
     res.status(500).json({ error: "Internal server Error" });
   }
 });
+*/
 
 app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "/public/login.html"));

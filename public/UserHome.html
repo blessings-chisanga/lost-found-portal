@@ -11,10 +11,10 @@
       <nav>
         <ul>
           <li>
-            <button><a href="/login.html">log out</output></a></button>
+            <button><a href="/logout">log out</output></a></button>
           </li>
           <li>
-            <button><a href="/signup.html">sign up</a></button>
+            <button><a href="">My Claims</a></button>
           </li>
         </ul>
       </nav>
@@ -28,7 +28,15 @@
     <script>
       async function fetchLostIds() {
         try {
-          const response = await fetch("http://localhost:3000/fetchIds");
+          const response = await fetch("http://localhost:3000/fetchIds", {
+            credentials: "include"
+          });
+
+          if (response.status === 401) {  
+              console.warn("Unauthorized: redirecting to login.")
+              location.assign('/unauthorizedMessage.html')
+              return;
+          }
           const data = await response.json();
 
           const cardContainer = document.querySelector(".lost-items-container");
@@ -51,6 +59,7 @@
           });
         } catch (err) {
           console.error("Error fetching items:", err);
+  
         }
       }
 
