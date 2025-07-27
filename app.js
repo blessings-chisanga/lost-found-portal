@@ -7,7 +7,6 @@ import path from "path";
 import { fileURLToPath } from "url";
 import cookieParser from "cookie-parser";
 
-
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
@@ -34,10 +33,9 @@ app.get("/fetchIds", async (req, res) => {
 });
 
 app.get("/", (req, res) => {
-  res.sendFile(path.join(__dirname, "/public/UserHome.html"));
+  res.sendFile(path.join(__dirname, "/public/login.html"));
 });
 
 app.listen(port, () => {
   console.log(`Server is listening at port ${port}!`);
 });
-

@@ -2,9 +2,9 @@ import pool from "../dB/db.js";
 import bcrypt from "bcryptjs";
 import path from "path";
 import { fileURLToPath } from "url";
-import jwt from 'jsonwebtoken';
+import jwt from "jsonwebtoken";
 import cookieParser from "cookie-parser";
-import dotenv from 'dotenv';
+import dotenv from "dotenv";
 dotenv.config();
 
 const __filename = fileURLToPath(import.meta.url);
@@ -20,17 +20,17 @@ export function login_get(req, res) {
 //Create token
 const maxAge = 3 * 24 * 60 * 60;
 
+//create jwt token function
 const createToken = (student_id) => {
-  return jwt.sign({student_id}, process.env.jwtSecret, {
-    expiresIn: maxAge
+  return jwt.sign({ student_id }, process.env.jwtSecret, {
+    expiresIn: maxAge,
   });
-}
+};
 
-//Signing up a user
+//Signing up a new user
 export async function signup_post(req, res) {
-  //middleware executes before this, so input is already saitized
-  const { student_id, firstName, lastName, email, phone, password } =
-    req.body;
+  //middleware executes before this, so input is already saitized at this point
+  const { student_id, firstName, lastName, email, phone, password } = req.body;
 
   try {
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -47,7 +47,7 @@ export async function signup_post(req, res) {
         .json({ success: false, message: "User already exists" });
     }
 
-    // If user does not exist, send to Database 
+    // If user does not exist, send to Database
     const [result] = await pool.execute(
       "INSERT INTO students (student_id, first_name, last_name, email, phone, password_hash) VALUES (?, ?, ?, ?, ?, ?)",
       [student_id, firstName, lastName, email, phone, hashedPassword]
@@ -56,35 +56,59 @@ export async function signup_post(req, res) {
     //Create JWT to log the signed up user to track their logged in status!
     const token = createToken(result.insertId);
     console.log(result);
-    
-    res.cookie('jwt', token, {httpOnly: true, maxAge: maxAge * 1000})
-    res
-      .status(201)
-      .json({
-        success: true, 
-        message: "Student registered successfully",
-        id: result.insertId
-      });
 
+    res.cookie("jwt", token, { httpOnly: true, maxAge: maxAge * 1000 });
+    res.status(201).json({
+      success: true,
+      message: "Student registered successfully",
+      id: result.insertId,
+    });
   } catch (error) {
     console.error(error);
-    res.status(500).json({success: false, message: "Internal server error" });
+    res.status(500).json({ success: false, message: "Internal server error" });
   }
 }
 
-export function login_post(req, res) {
-  const { email, password } = req.body;
-  console.log(password + " " + email);
-  res.status(200).json({
-    message: "You are logged in"
-  })
+//login fucntionality
+export async function login_post(req, res) {
+   const { student_id, password } = req.body;
 
-  //Check if Student ID exisits in database
-      //if not send back error "User does not exist"
-  //if exists, get the passoword sent, hash it and compare with the password in the database
-      //if not match, send back error
-  //if match send back user id & jwt
-    //User is logged in at this point, as long as they have the jwt they are authorized 
+    try {
+      const [result] = await pool.execute(
+        "SELECT * FROM students WHERE student_id = ? OR email = ?",
+        [student_id, student_id]
+      );
+
+      if (result.length == 0) {
+        return res
+        .status(400)
+        .json({ success: false, message: "No such user was found" });
+      } 
+
+     const student = result[0];
+     const validPassword = await bcrypt.compare(password, student.password_hash);
+
+     if (!validPassword) {
+      return res.status(400).json({ success: false, message: "Invalid credentials" });
+     }
+
+     const token = createToken(student.insertId);
+     res.cookie("jwt", token, { httpOnly: true, maxAge: maxAge * 1000 });
+     res.status(200).json({
+       success: true,
+       message: "Login Successful!",
+       id: student.insertId,
+     });
+
+
+  
+    } catch (error){
+      console.error("database error", error.message);
+      res.status(500).json({
+        success: false,
+        message: "Something went wrong while handling the login request",
+      });
+    }
 }
 
 export default {

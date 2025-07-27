@@ -11,7 +11,7 @@
       <nav>
         <ul>
           <li>
-            <button><a href="/login.html">log in</a></button>
+            <button><a href="/login.html">log out</output></a></button>
           </li>
           <li>
             <button><a href="/signup.html">sign up</a></button>
@@ -23,9 +23,7 @@
       <div class="headings">
         <h1>Unclaimed Ids</h1>
       </div>
-      <div class="lost-items-container">
-
-      </div>
+      <div class="lost-items-container"></div>
     </main>
     <script>
       async function fetchLostIds() {
@@ -33,7 +31,7 @@
           const response = await fetch("http://localhost:3000/fetchIds");
           const data = await response.json();
 
-          const cardContainer = document.querySelector('.lost-items-container');
+          const cardContainer = document.querySelector(".lost-items-container");
           data.forEach((lostId) => {
             const li = document.createElement("li");
             const card = document.createElement("div");
@@ -55,7 +53,7 @@
           console.error("Error fetching items:", err);
         }
       }
-      
+
       fetchLostIds();
     </script>
   </body>

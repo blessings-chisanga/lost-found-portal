@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Lost Items</title>
-    <link rel="stylesheet" href="/styles.css">
+    <link rel="stylesheet" href="/loginpage.css">
 </head>
 <body>
     <header>
@@ -19,37 +19,64 @@
         </nav>
     </header>
     <h3>Log In to proceed!</h3>
-    <form action="/login">
+    <form>
         <h2>Login</h2> 
         <label for="email">Unza Student ID</label>
         <input type="number" name="student_id"  />
-        <div class="student_id error"></div>
         <label for="password">Password</label>
         <input type="password" name="password"  />
-        <div class="password error"></div>
+        <div class="error"></div>
         <button>Log In</button>
     </form>
     <script>
         const form = document.querySelector('form');
         form.addEventListener('submit', async (e) => {
-            e.preventDefault();
+            e.preventDefault();    
 
             const student_id = form.student_id.value;
             const password = form.password.value;
+            const submitBtn = form.querySelector('button');
 
+            const errordiv = document.querySelector('.error')
+            errordiv.textContent = ""
+
+            if (!student_id || !password) {
+             errordiv.textContent = "Please enter both Student ID and Password.";
+             return;
+            }
+
+            submitBtn.disabled = true;
+            submitBtn.textContent = "Logging in...";
+
+            try {
             const response = await fetch("/login", {
                 method: "POST",
                 headers: {
                 "Content-Type": "application/json",
                 },
                 body: JSON.stringify({
-                email,
+                student_id,
                 password
                 })
-            });
+            }); 
+                const res = await response.json()
 
-          const res = await response.json()
-          console.log(res);
+                if (!response.ok) {
+                    console.log("Login Error", res.message );
+                    errordiv.textContent = res.message || "login failed";
+                    
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = "Log In";
+
+                }
+                else {
+                    console.log("Login successful", res.message);
+                    location.assign("/UserHome.html");
+                }
+            } 
+            catch (error) {
+                console.error("response", error.message);
+            }
         })
     </script>
 </body>
