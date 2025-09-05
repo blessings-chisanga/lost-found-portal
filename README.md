@@ -17,7 +17,5 @@ A **Lost and Found** application designed for university campuses. This app help
 
 - Mysql
 
-**Storage:**
-- Virtual Private Server (VPS)
 
 
