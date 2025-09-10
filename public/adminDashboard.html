@@ -3,7 +3,1479 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Admin</title>
+    <link rel="stylesheet" href="../adminDashboard.css" />
+    <title>Admin Dashboard - Lost ID Management System</title>
   </head>
-  <body></body>
+  <body>
+    <header class="admin-header">
+      <div class="header-content">
+        <div class="logo">Lost ID Management System</div>
+        <div class="admin-info">
+          <span id="adminName">Admin User</span>
+          <button
+            class="btn btn-sm"
+            onclick="logout()"
+            style="background: rgba(255, 255, 255, 0.2)"
+          >
+            Logout
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <div class="main-container">
+      <!-- Navigation Tabs -->
+      <div class="nav-tabs">
+        <button class="nav-tab active" onclick="showTab('dashboard')">
+          Dashboard
+        </button>
+        <button class="nav-tab" onclick="showTab('lost-ids')">
+          Manage Lost IDs
+        </button>
+        <button class="nav-tab" onclick="showTab('claims')">
+          Manage Claims
+        </button>
+        <button class="nav-tab" onclick="showTab('statistics')">
+          Statistics
+        </button>
+        <button class="nav-tab" onclick="showTab('export')">Export Data</button>
+      </div>
+
+      <!-- Dashboard Tab -->
+      <div id="dashboard" class="tab-content active">
+        <div class="help-section">
+          <div class="help-title">Welcome to the Lost ID Management System</div>
+          <div class="help-text">
+            This dashboard helps you manage found student IDs efficiently. You
+            can add new found IDs, process claims from students, and track
+            statistics. Use the navigation tabs above to access different
+            features. The dashboard shows your key metrics and recent activity.
+          </div>
+        </div>
+
+        <div id="dashboardStats" class="stats-grid">
+          <!-- Stats will be loaded here -->
+        </div>
+
+        <div class="content-card">
+          <div class="card-header">
+            <h3 class="card-title">Recent Activity</h3>
+          </div>
+          <div class="card-content">
+            <div id="recentActivity">Loading recent activity...</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Lost IDs Management Tab -->
+      <div id="lost-ids" class="tab-content">
+        <div class="help-section">
+          <div class="help-title">Lost ID Management</div>
+          <div class="help-text">
+            Here you can add new found IDs to the system and manage existing
+            entries. When adding an ID, include as much detail as possible to
+            help students identify their belongings. You can upload a photo of
+            the ID to make verification easier. Use the search and filters to
+            quickly find specific IDs.
+          </div>
+        </div>
+
+        <div class="content-card">
+          <div class="card-header">
+            <h3 class="card-title">Add New Lost ID</h3>
+          </div>
+          <div class="card-content">
+            <form id="addLostIdForm">
+              <div
+                style="
+                  display: grid;
+                  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+                  gap: 1rem;
+                "
+              >
+                <div class="form-group">
+                  <label class="form-label">Student ID Number</label>
+                  <input
+                    type="text"
+                    id="studentId"
+                    class="form-control"
+                    required
+                  />
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Student Name</label>
+                  <input
+                    type="text"
+                    id="studentName"
+                    class="form-control"
+                    required
+                  />
+                </div>
+                <div class="form-group">
+                  <label class="form-label">ID Type</label>
+                  <select id="idType" class="form-control" required>
+                    <option value="">Select ID Type</option>
+                    <option value="student_id">Student ID Card</option>
+                    <option value="government_issued">
+                      Government Issued ID
+                    </option>
+                    <option value="other">Other</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Date Found</label>
+                  <input
+                    type="date"
+                    id="foundDate"
+                    class="form-control"
+                    required
+                  />
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Location Found</label>
+                  <input
+                    type="text"
+                    id="foundLocation"
+                    class="form-control"
+                    required
+                    placeholder="e.g., Library, Cafeteria, Lecture Hall A"
+                  />
+                </div>
+                <div class="form-group">
+                  <label class="form-label">ID Photo (Optional)</label>
+                  <input
+                    type="file"
+                    id="idImage"
+                    class="form-control"
+                    accept="image/*"
+                  />
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Additional Description</label>
+                <textarea
+                  id="description"
+                  class="form-control"
+                  rows="3"
+                  placeholder="Any additional details that might help identify the owner"
+                ></textarea>
+              </div>
+              <button type="submit" class="btn btn-primary">Add Lost ID</button>
+            </form>
+          </div>
+        </div>
+
+        <div class="content-card">
+          <div class="card-header">
+            <h3 class="card-title">Lost IDs List</h3>
+          </div>
+          <div class="card-content">
+            <div class="search-bar">
+              <input
+                type="text"
+                id="lostIdSearch"
+                placeholder="Search by name, student ID, or description"
+                style="flex: 1"
+              />
+              <select id="statusFilter">
+                <option value="all">All Statuses</option>
+                <option value="available">Available</option>
+                <option value="claimed">Claimed</option>
+                <option value="returned">Returned</option>
+              </select>
+              <select id="typeFilter">
+                <option value="all">All Types</option>
+                <option value="student_id">Student ID</option>
+                <option value="government_issued">Government ID</option>
+                <option value="other">Other</option>
+              </select>
+              <button class="btn btn-primary" onclick="searchLostIds()">
+                Search
+              </button>
+            </div>
+            <div id="lostIdsList">Loading lost IDs...</div>
+            <div id="lostIdsPagination" class="pagination"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Claims Management Tab -->
+      <div id="claims" class="tab-content">
+        <div class="help-section">
+          <div class="help-title">Claims Management</div>
+          <div class="help-text">
+            Process claims submitted by students trying to recover their lost
+            IDs. Review the verification details provided by the claimant and
+            compare them with the found ID information. You can approve valid
+            claims (making them ready for collection), reject invalid ones, or
+            mark approved claims as collected when students pick up their IDs.
+          </div>
+        </div>
+
+        <div class="content-card">
+          <div class="card-header">
+            <h3 class="card-title">Claims List</h3>
+          </div>
+          <div class="card-content">
+            <div class="search-bar">
+              <input
+                type="text"
+                id="claimSearch"
+                placeholder="Search by student name or ID"
+                style="flex: 1"
+              />
+              <select id="claimStatusFilter">
+                <option value="all">All Statuses</option>
+                <option value="pending">Pending</option>
+                <option value="approved">Approved</option>
+                <option value="rejected">Rejected</option>
+                <option value="collected">Collected</option>
+              </select>
+              <button class="btn btn-primary" onclick="searchClaims()">
+                Search
+              </button>
+            </div>
+            <div id="claimsList">Loading claims...</div>
+            <div id="claimsPagination" class="pagination"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Statistics Tab -->
+      <div id="statistics" class="tab-content">
+        <div class="help-section">
+          <div class="help-title">System Statistics</div>
+          <div class="help-text">
+            View detailed statistics about the system's performance including
+            processing times, location trends, and ID type distributions. Use
+            the time period filters to analyze data for specific date ranges.
+          </div>
+        </div>
+
+        <div class="content-card">
+          <div class="card-header">
+            <h3 class="card-title">ID Type Statistics</h3>
+          </div>
+          <div class="card-content">
+            <div style="margin-bottom: 1rem">
+              <select
+                id="idStatsperiod"
+                class="form-control"
+                style="width: auto"
+                onchange="loadIdTypeStats()"
+              >
+                <option value="all">All Time</option>
+                <option value="30">Last 30 Days</option>
+                <option value="90">Last 90 Days</option>
+                <option value="365">Last Year</option>
+              </select>
+            </div>
+            <div id="idTypeStats">Loading statistics...</div>
+          </div>
+        </div>
+
+        <div class="content-card">
+          <div class="card-header">
+            <h3 class="card-title">Location Statistics</h3>
+          </div>
+          <div class="card-content">
+            <div style="margin-bottom: 1rem">
+              <select
+                id="locationStatsperiod"
+                class="form-control"
+                style="width: auto"
+                onchange="loadLocationStats()"
+              >
+                <option value="all">All Time</option>
+                <option value="30">Last 30 Days</option>
+                <option value="90">Last 90 Days</option>
+                <option value="365">Last Year</option>
+              </select>
+            </div>
+            <div id="locationStats">Loading statistics...</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Export Tab -->
+      <div id="export" class="tab-content">
+        <div class="help-section">
+          <div class="help-title">Data Export</div>
+          <div class="help-text">
+            Export system data to CSV format for external analysis or record
+            keeping. Choose the data type and date range for your export. The
+            exported files can be opened in Excel or other spreadsheet
+            applications.
+          </div>
+        </div>
+
+        <div class="content-card">
+          <div class="card-header">
+            <h3 class="card-title">Export Data</h3>
+          </div>
+          <div class="card-content">
+            <form id="exportForm">
+              <div
+                style="
+                  display: grid;
+                  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+                  gap: 1rem;
+                  margin-bottom: 1rem;
+                "
+              >
+                <div class="form-group">
+                  <label class="form-label">Data Type</label>
+                  <select id="exportType" class="form-control" required>
+                    <option value="claims">Claims Data</option>
+                    <option value="lost_ids">Lost IDs Data</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Start Date (Optional)</label>
+                  <input
+                    type="date"
+                    id="exportStartDate"
+                    class="form-control"
+                  />
+                </div>
+                <div class="form-group">
+                  <label class="form-label">End Date (Optional)</label>
+                  <input type="date" id="exportEndDate" class="form-control" />
+                </div>
+              </div>
+              <button type="submit" class="btn btn-primary">
+                Export to CSV
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal for viewing/editing details -->
+    <div id="detailModal" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3 id="modalTitle">Details</h3>
+          <button class="close-btn" onclick="closeModal()">&times;</button>
+        </div>
+        <div id="modalBody">
+          <!-- Content will be loaded here -->
+        </div>
+      </div>
+    </div>
+
+    <!-- Alert container -->
+    <div
+      id="alertContainer"
+      style="position: fixed; top: 20px; right: 20px; z-index: 1001"
+    ></div>
+
+    <script>
+      // Configuration - Update these with your actual API endpoint
+      const API_BASE_URL = "http://localhost:3000/api/admin";
+
+      // Global variables
+      let currentPage = {
+        lostIds: 1,
+        claims: 1,
+      };
+      let itemsPerPage = 20;
+
+      // Initialize the application
+      document.addEventListener("DOMContentLoaded", function () {
+        // Set today as default for found date
+        document.getElementById("foundDate").value = new Date()
+          .toISOString()
+          .split("T")[0];
+
+        // Load initial data
+        loadDashboard();
+
+        // Set up form handlers
+        setupFormHandlers();
+
+        // Set up search handlers
+        setupSearchHandlers();
+      });
+
+      // Tab management
+      function showTab(tabName) {
+        // Hide all tab contents
+        document.querySelectorAll(".tab-content").forEach((content) => {
+          content.classList.remove("active");
+        });
+
+        // Remove active class from all nav tabs
+        document.querySelectorAll(".nav-tab").forEach((tab) => {
+          tab.classList.remove("active");
+        });
+
+        // Show selected tab content
+        document.getElementById(tabName).classList.add("active");
+
+        // Add active class to clicked nav tab
+        event.target.classList.add("active");
+
+        // Load tab-specific data
+        switch (tabName) {
+          case "dashboard":
+            loadDashboard();
+            break;
+          case "lost-ids":
+            loadLostIds();
+            break;
+          case "claims":
+            loadClaims();
+            break;
+          case "statistics":
+            loadStatistics();
+            break;
+        }
+      }
+
+      // API utility functions
+      async function apiCall(endpoint, options = {}) {
+        try {
+          const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+            ...options,
+            headers: {
+              "Content-Type": "application/json",
+              ...options.headers,
+            },
+            credentials: "include",
+          });
+
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+
+          return await response.json();
+        } catch (error) {
+          console.error("API call error:", error);
+          showAlert("error", `API Error: ${error.message}`);
+          throw error;
+        }
+      }
+
+      async function apiCallWithFormData(endpoint, formData) {
+        try {
+          const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+            method: "POST",
+            body: formData,
+            credentials: "include", 
+          });
+
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+
+          return await response.json();
+        } catch (error) {
+          console.error("API call error:", error);
+          showAlert("error", `API Error: ${error.message}`);
+          throw error;
+        }
+      }
+
+      // Dashboard functions
+      async function loadDashboard() {
+        try {
+          console.log("Loading dashboard data...");
+
+          // Load dashboard stats first
+          const statsResponse = await apiCall("/dashboard");
+          displayDashboardStats(statsResponse.data);
+
+          // Then load activity feed (which has been problematic)
+          try {
+            const activityResponse = await apiCall("/activity?limit=10");
+            displayRecentActivity(activityResponse.data);
+          } catch (activityError) {
+            console.error("Failed to load activity feed:", activityError);
+            document.getElementById("recentActivity").innerHTML = `
+                        <div class="alert alert-error">
+                            <strong>Activity Feed Error:</strong> Unable to load recent activity. 
+                            Please check the server logs for more details.
+                        </div>
+                    `;
+          }
+        } catch (error) {
+          console.error("Dashboard loading error:", error);
+          document.getElementById("dashboardStats").innerHTML = `
+                    <div class="alert alert-error">
+                        <strong>Dashboard Error:</strong> Unable to load dashboard statistics. 
+                        Please ensure you're logged in and the server is running.
+                    </div>
+                `;
+          document.getElementById("recentActivity").innerHTML = `
+                    <div class="alert alert-error">
+                        Unable to load recent activity.
+                    </div>
+                `;
+          showAlert(
+            "error",
+            "Failed to load dashboard data. Please refresh the page and try again."
+          );
+        }
+      }
+
+      function displayDashboardStats(data) {
+        const statsGrid = document.getElementById("dashboardStats");
+        statsGrid.innerHTML = `
+                <div class="stat-card">
+                    <div class="stat-number">${data.overview.total_lost_ids}</div>
+                    <div class="stat-label">Total Lost IDs</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">${data.overview.available_ids}</div>
+                    <div class="stat-label">Available for Claims</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">${data.overview.pending_claims}</div>
+                    <div class="stat-label">Pending Claims</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">${data.overview.returned_ids}</div>
+                    <div class="stat-label">Successfully Returned</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">${data.overview.success_rate}%</div>
+                    <div class="stat-label">Success Rate</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">${data.recent_activity.new_lost_ids}</div>
+                    <div class="stat-label">New IDs This Week</div>
+                </div>
+            `;
+      }
+
+      function displayRecentActivity(activities) {
+        const activityDiv = document.getElementById("recentActivity");
+
+        if (!activities || activities.length === 0) {
+          activityDiv.innerHTML =
+            '<p class="help-text">No recent activity to display.</p>';
+          return;
+        }
+
+        const activityHTML = activities
+          .map((activity) => {
+            const timeAgo = getTimeAgo(activity.activity_time);
+            const actorName =
+              activity.admin_name || activity.actor_name || "System";
+
+            let message = "";
+            switch (activity.activity_type) {
+              case "lost_id_added":
+                message = `${actorName} added a lost ${activity.id_type} for ${activity.student_name}`;
+                break;
+              case "claim_approved":
+                message = `${actorName} approved a claim for ${activity.student_name}'s ${activity.id_type}`;
+                break;
+              case "claim_rejected":
+                message = `${actorName} rejected a claim for ${activity.student_name}'s ${activity.id_type}`;
+                break;
+              case "claim_collected":
+                message = `${activity.student_name}'s ${activity.id_type} was collected`;
+                break;
+              default:
+                message = `Activity on ${activity.student_name}'s ${activity.id_type}`;
+            }
+
+            return `
+                    <div style="padding: 0.75rem 0; border-bottom: 1px solid #eee;">
+                        <div style="font-weight: 500;">${message}</div>
+                        <div style="color: #666; font-size: 0.875rem;">${timeAgo}</div>
+                    </div>
+                `;
+          })
+          .join("");
+
+        activityDiv.innerHTML = activityHTML;
+      }
+
+      // Lost IDs management functions
+      async function loadLostIds(page = 1) {
+        try {
+          const searchParams = new URLSearchParams({
+            page,
+            limit: itemsPerPage,
+            search: document.getElementById("lostIdSearch")?.value || "",
+            status: document.getElementById("statusFilter")?.value || "all",
+            id_type: document.getElementById("typeFilter")?.value || "all",
+          });
+
+          const response = await apiCall(`/lost-ids?${searchParams}`);
+          displayLostIds(response.data, response.pagination);
+          displayPagination("lostIds", response.pagination);
+        } catch (error) {
+          document.getElementById("lostIdsList").innerHTML =
+            '<p class="alert alert-error">Failed to load lost IDs</p>';
+        }
+      }
+
+      function displayLostIds(lostIds, pagination) {
+        const listDiv = document.getElementById("lostIdsList");
+
+        if (!lostIds || lostIds.length === 0) {
+          listDiv.innerHTML =
+            '<p class="help-text">No lost IDs found matching your criteria.</p>';
+          return;
+        }
+
+        const tableHTML = `
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Student Info</th>
+                            <th>ID Type</th>
+                            <th>Found Date/Location</th>
+                            <th>Status</th>
+                            <th>Claims</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${lostIds
+                          .map(
+                            (item) => `
+                            <tr>
+                                <td>
+                                    <strong>${item.student_name}</strong><br>
+                                    <small>ID: ${item.student_id}</small>
+                                </td>
+                                <td>${formatIdType(item.id_type)}</td>
+                                <td>
+                                    ${formatDate(item.found_date)}<br>
+                                    <small>${item.found_location}</small>
+                                </td>
+                                <td>
+                                    <span class="status-badge status-${
+                                      item.status
+                                    }">${formatStatus(item.status)}</span>
+                                </td>
+                                <td>${item.claims_count || 0}</td>
+                                <td>
+                                    <button class="btn btn-sm btn-primary" onclick="viewLostIdDetails(${
+                                      item.id
+                                    })">View</button>
+                                    <button class="btn btn-sm btn-warning" onclick="editLostId(${
+                                      item.id
+                                    })">Edit</button>
+                                    ${
+                                      item.status === "available"
+                                        ? `<button class="btn btn-sm btn-danger" onclick="deleteLostId(${item.id})">Delete</button>`
+                                        : ""
+                                    }
+                                </td>
+                            </tr>
+                        `
+                          )
+                          .join("")}
+                    </tbody>
+                </table>
+            `;
+
+        listDiv.innerHTML = tableHTML;
+      }
+
+      // Claims management functions
+      async function loadClaims(page = 1) {
+        try {
+          const searchParams = new URLSearchParams({
+            page,
+            limit: itemsPerPage,
+            search: document.getElementById("claimSearch")?.value || "",
+            status:
+              document.getElementById("claimStatusFilter")?.value || "all",
+          });
+
+          const response = await apiCall(`/claims?${searchParams}`);
+          displayClaims(response.data, response.pagination);
+          displayPagination("claims", response.pagination);
+        } catch (error) {
+          document.getElementById("claimsList").innerHTML =
+            '<p class="alert alert-error">Failed to load claims</p>';
+        }
+      }
+
+      function displayClaims(claims, pagination) {
+        const listDiv = document.getElementById("claimsList");
+
+        if (!claims || claims.length === 0) {
+          listDiv.innerHTML =
+            '<p class="help-text">No claims found matching your criteria.</p>';
+          return;
+        }
+
+        const tableHTML = `
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Lost ID Info</th>
+                            <th>Claimant</th>
+                            <th>Claim Date</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${claims
+                          .map(
+                            (claim) => `
+                            <tr>
+                                <td>
+                                    <strong>${
+                                      claim.lost_student_name
+                                    }</strong><br>
+                                    <small>${formatIdType(claim.id_type)} - ${
+                              claim.lost_student_id
+                            }</small>
+                                </td>
+                                <td>
+                                    <strong>${claim.first_name} ${
+                              claim.last_name
+                            }</strong><br>
+                                    <small>${claim.claimant_student_id}</small>
+                                </td>
+                                <td>${formatDate(claim.claim_date)}</td>
+                                <td>
+                                    <span class="status-badge status-${
+                                      claim.status
+                                    }">${formatStatus(claim.status)}</span>
+                                </td>
+                                <td>
+                                    <button class="btn btn-sm btn-primary" onclick="viewClaimDetails(${
+                                      claim.id
+                                    })">View</button>
+                                    ${
+                                      claim.status === "pending"
+                                        ? `
+                                        <button class="btn btn-sm btn-success" onclick="approveClaim(${claim.id})">Approve</button>
+                                        <button class="btn btn-sm btn-danger" onclick="rejectClaim(${claim.id})">Reject</button>
+                                    `
+                                        : ""
+                                    }
+                                    ${
+                                      claim.status === "approved"
+                                        ? `
+                                        <button class="btn btn-sm btn-success" onclick="markCollected(${claim.id})">Mark Collected</button>
+                                    `
+                                        : ""
+                                    }
+                                </td>
+                            </tr>
+                        `
+                          )
+                          .join("")}
+                    </tbody>
+                </table>
+            `;
+
+        listDiv.innerHTML = tableHTML;
+      }
+
+      // Statistics functions
+      async function loadStatistics() {
+        loadIdTypeStats();
+        loadLocationStats();
+      }
+
+      async function loadIdTypeStats() {
+        try {
+          const period = document.getElementById("idStatsperiod").value;
+          const params = period !== "all" ? `?period=${period}` : "";
+          const response = await apiCall(`/stats/id-types${params}`);
+          displayIdTypeStats(response.data);
+        } catch (error) {
+          document.getElementById("idTypeStats").innerHTML =
+            '<p class="alert alert-error">Failed to load ID type statistics</p>';
+        }
+      }
+
+      async function loadLocationStats() {
+        try {
+          const period = document.getElementById("locationStatsperiod").value;
+          const params = period !== "all" ? `?period=${period}` : "";
+          const response = await apiCall(`/stats/locations${params}`);
+          displayLocationStats(response.data);
+        } catch (error) {
+          document.getElementById("locationStats").innerHTML =
+            '<p class="alert alert-error">Failed to load location statistics</p>';
+        }
+      }
+
+      function displayIdTypeStats(stats) {
+        const statsDiv = document.getElementById("idTypeStats");
+
+        if (!stats || stats.length === 0) {
+          statsDiv.innerHTML =
+            '<p class="help-text">No statistics available for the selected period.</p>';
+          return;
+        }
+
+        const tableHTML = `
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>ID Type</th>
+                            <th>Total Found</th>
+                            <th>Available</th>
+                            <th>Claimed</th>
+                            <th>Returned</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${stats
+                          .map(
+                            (stat) => `
+                            <tr>
+                                <td>${formatIdType(stat.id_type)}</td>
+                                <td>${stat.total_count}</td>
+                                <td>${stat.available_count}</td>
+                                <td>${stat.claimed_count}</td>
+                                <td>${stat.returned_count}</td>
+                            </tr>
+                        `
+                          )
+                          .join("")}
+                    </tbody>
+                </table>
+            `;
+
+        statsDiv.innerHTML = tableHTML;
+      }
+
+      function displayLocationStats(stats) {
+        const statsDiv = document.getElementById("locationStats");
+
+        if (!stats || stats.length === 0) {
+          statsDiv.innerHTML =
+            '<p class="help-text">No statistics available for the selected period.</p>';
+          return;
+        }
+
+        const tableHTML = `
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Location</th>
+                            <th>Total Found</th>
+                            <th>Returned</th>
+                            <th>Return Rate</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${stats
+                          .map(
+                            (stat) => `
+                            <tr>
+                                <td>${stat.found_location}</td>
+                                <td>${stat.total_count}</td>
+                                <td>${stat.returned_count}</td>
+                                <td>${stat.return_rate}%</td>
+                            </tr>
+                        `
+                          )
+                          .join("")}
+                    </tbody>
+                </table>
+            `;
+
+        statsDiv.innerHTML = tableHTML;
+      }
+
+      // Form handlers
+      function setupFormHandlers() {
+        // Add Lost ID form
+        document
+          .getElementById("addLostIdForm")
+          .addEventListener("submit", async function (e) {
+            e.preventDefault();
+            await submitLostId();
+          });
+
+        // Export form
+        document
+          .getElementById("exportForm")
+          .addEventListener("submit", async function (e) {
+            e.preventDefault();
+            await exportData();
+          });
+      }
+
+      function setupSearchHandlers() {
+        // Lost IDs search
+        document
+          .getElementById("lostIdSearch")
+          .addEventListener("keypress", function (e) {
+            if (e.key === "Enter") {
+              searchLostIds();
+            }
+          });
+
+        // Claims search
+        document
+          .getElementById("claimSearch")
+          .addEventListener("keypress", function (e) {
+            if (e.key === "Enter") {
+              searchClaims();
+            }
+          });
+      }
+
+      async function submitLostId() {
+        try {
+          const formData = new FormData();
+          formData.append(
+            "student_id",
+            document.getElementById("studentId").value
+          );
+          formData.append(
+            "student_name",
+            document.getElementById("studentName").value
+          );
+          formData.append("id_type", document.getElementById("idType").value);
+          formData.append(
+            "found_date",
+            document.getElementById("foundDate").value
+          );
+          formData.append(
+            "found_location",
+            document.getElementById("foundLocation").value
+          );
+          formData.append(
+            "description",
+            document.getElementById("description").value
+          );
+
+          const imageFile = document.getElementById("idImage").files[0];
+          if (imageFile) {
+            formData.append("image", imageFile);
+          }
+
+          const response = await apiCallWithFormData("/lost-ids", formData);
+
+          showAlert("success", "Lost ID added successfully!");
+          document.getElementById("addLostIdForm").reset();
+          document.getElementById("foundDate").value = new Date()
+            .toISOString()
+            .split("T")[0];
+          loadLostIds();
+        } catch (error) {
+          showAlert(
+            "error",
+            "Failed to add lost ID. Please check all required fields."
+          );
+        }
+      }
+
+      // Search functions
+      function searchLostIds() {
+        currentPage.lostIds = 1;
+        loadLostIds();
+      }
+
+      function searchClaims() {
+        currentPage.claims = 1;
+        loadClaims();
+      }
+
+      // Action functions
+      async function viewLostIdDetails(id) {
+        try {
+          const response = await apiCall(`/lost-ids/${id}`);
+          const lostId = response.data;
+
+          const modalBody = document.getElementById("modalBody");
+          modalBody.innerHTML = `
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem;">
+                        <div>
+                            <strong>Student Name:</strong> ${
+                              lostId.student_name
+                            }<br>
+                            <strong>Student ID:</strong> ${
+                              lostId.student_id
+                            }<br>
+                            <strong>ID Type:</strong> ${formatIdType(
+                              lostId.id_type
+                            )}<br>
+                            <strong>Status:</strong> <span class="status-badge status-${
+                              lostId.status
+                            }">${formatStatus(lostId.status)}</span>
+                        </div>
+                        <div>
+                            <strong>Found Date:</strong> ${formatDate(
+                              lostId.found_date
+                            )}<br>
+                            <strong>Found Location:</strong> ${
+                              lostId.found_location
+                            }<br>
+                            <strong>Added By:</strong> ${
+                              lostId.added_by_admin
+                            }<br>
+                            <strong>Added Date:</strong> ${formatDateTime(
+                              lostId.created_at
+                            )}
+                        </div>
+                    </div>
+                    ${
+                      lostId.description
+                        ? `<div style="margin-top: 1rem;"><strong>Description:</strong><br>${lostId.description}</div>`
+                        : ""
+                    }
+                    ${
+                      lostId.image_url
+                        ? `<div style="margin-top: 1rem;"><strong>ID Image:</strong><br><img src="${lostId.image_url}" style="max-width: 300px; max-height: 200px; border: 1px solid #ddd; border-radius: 8px;"></div>`
+                        : ""
+                    }
+                    ${
+                      lostId.claims && lostId.claims.length > 0
+                        ? `
+                        <div style="margin-top: 1rem;">
+                            <strong>Claims History:</strong>
+                            <table class="table" style="margin-top: 0.5rem;">
+                                <thead>
+                                    <tr><th>Claimant</th><th>Claim Date</th><th>Status</th></tr>
+                                </thead>
+                                <tbody>
+                                    ${lostId.claims
+                                      .map(
+                                        (claim) => `
+                                        <tr>
+                                            <td>${claim.first_name} ${
+                                          claim.last_name
+                                        } (${claim.student_id})</td>
+                                            <td>${formatDate(
+                                              claim.claim_date
+                                            )}</td>
+                                            <td><span class="status-badge status-${
+                                              claim.status
+                                            }">${formatStatus(
+                                          claim.status
+                                        )}</span></td>
+                                        </tr>
+                                    `
+                                      )
+                                      .join("")}
+                                </tbody>
+                            </table>
+                        </div>
+                    `
+                        : ""
+                    }
+                `;
+
+          document.getElementById("modalTitle").textContent = "Lost ID Details";
+          document.getElementById("detailModal").classList.add("active");
+        } catch (error) {
+          showAlert("error", "Failed to load lost ID details");
+        }
+      }
+
+      async function viewClaimDetails(id) {
+        try {
+          const response = await apiCall(`/claims/${id}`);
+          const claim = response.data;
+
+          const modalBody = document.getElementById("modalBody");
+          modalBody.innerHTML = `
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+                        <div>
+                            <h4>Lost ID Information</h4>
+                            <strong>Owner:</strong> ${
+                              claim.lost_student_name
+                            }<br>
+                            <strong>Student ID:</strong> ${
+                              claim.lost_student_id
+                            }<br>
+                            <strong>ID Type:</strong> ${formatIdType(
+                              claim.id_type
+                            )}<br>
+                            <strong>Found Date:</strong> ${formatDate(
+                              claim.found_date
+                            )}<br>
+                            <strong>Found Location:</strong> ${
+                              claim.found_location
+                            }<br>
+                            ${
+                              claim.description
+                                ? `<strong>Description:</strong> ${claim.description}<br>`
+                                : ""
+                            }
+                            ${
+                              claim.image_url
+                                ? `<div style="margin-top: 1rem;"><img src="${claim.image_url}" style="max-width: 200px; max-height: 150px; border: 1px solid #ddd; border-radius: 8px;"></div>`
+                                : ""
+                            }
+                        </div>
+                        <div>
+                            <h4>Claimant Information</h4>
+                            <strong>Name:</strong> ${claim.first_name} ${
+            claim.last_name
+          }<br>
+                            <strong>Student ID:</strong> ${
+                              claim.claimant_student_id
+                            }<br>
+                            <strong>Email:</strong> ${claim.email}<br>
+                            <strong>Phone:</strong> ${
+                              claim.phone || "Not provided"
+                            }<br>
+                            <strong>Claim Date:</strong> ${formatDateTime(
+                              claim.claim_date
+                            )}<br>
+                            <strong>Status:</strong> <span class="status-badge status-${
+                              claim.status
+                            }">${formatStatus(claim.status)}</span>
+                        </div>
+                    </div>
+                    <div style="margin-top: 2rem;">
+                        <h4>Verification Details</h4>
+                        <div style="background: #f8f9fa; padding: 1rem; border-radius: 8px;">
+                            ${
+                              claim.verification_details ||
+                              "No verification details provided"
+                            }
+                        </div>
+                    </div>
+                    ${
+                      claim.admin_notes
+                        ? `
+                        <div style="margin-top: 1rem;">
+                            <h4>Admin Notes</h4>
+                            <div style="background: #f8f9fa; padding: 1rem; border-radius: 8px;">
+                                ${claim.admin_notes}
+                            </div>
+                        </div>
+                    `
+                        : ""
+                    }
+                    ${
+                      claim.status === "pending"
+                        ? `
+                        <div style="margin-top: 2rem; display: flex; gap: 1rem;">
+                            <button class="btn btn-success" onclick="approveClaimFromModal(${claim.id})">Approve Claim</button>
+                            <button class="btn btn-danger" onclick="rejectClaimFromModal(${claim.id})">Reject Claim</button>
+                        </div>
+                    `
+                        : ""
+                    }
+                    ${
+                      claim.status === "approved"
+                        ? `
+                        <div style="margin-top: 2rem;">
+                            <button class="btn btn-success" onclick="markCollectedFromModal(${claim.id})">Mark as Collected</button>
+                        </div>
+                    `
+                        : ""
+                    }
+                `;
+
+          document.getElementById("modalTitle").textContent = "Claim Details";
+          document.getElementById("detailModal").classList.add("active");
+        } catch (error) {
+          showAlert("error", "Failed to load claim details");
+        }
+      }
+
+      async function approveClaim(id, fromModal = false) {
+        const notes = prompt("Enter approval notes (optional):");
+        if (notes === null) return; // User cancelled
+
+        try {
+          await apiCall(`/claims/${id}/approve`, {
+            method: "POST",
+            body: JSON.stringify({ admin_notes: notes }),
+          });
+
+          showAlert("success", "Claim approved successfully!");
+          loadClaims();
+          if (fromModal) closeModal();
+        } catch (error) {
+          showAlert("error", "Failed to approve claim");
+        }
+      }
+
+      async function rejectClaim(id, fromModal = false) {
+        const notes = prompt("Enter rejection reason (required):");
+        if (!notes) {
+          showAlert("error", "Rejection reason is required");
+          return;
+        }
+
+        try {
+          await apiCall(`/claims/${id}/reject`, {
+            method: "POST",
+            body: JSON.stringify({ admin_notes: notes }),
+          });
+
+          showAlert("success", "Claim rejected successfully!");
+          loadClaims();
+          if (fromModal) closeModal();
+        } catch (error) {
+          showAlert("error", "Failed to reject claim");
+        }
+      }
+
+      async function markCollected(id, fromModal = false) {
+        const notes = prompt("Enter collection notes (optional):");
+        if (notes === null) return; // User cancelled
+
+        try {
+          await apiCall(`/claims/${id}/collect`, {
+            method: "POST",
+            body: JSON.stringify({ admin_notes: notes }),
+          });
+
+          showAlert("success", "ID marked as collected successfully!");
+          loadClaims();
+          loadDashboard(); // Refresh dashboard stats
+          if (fromModal) closeModal();
+        } catch (error) {
+          showAlert("error", "Failed to mark ID as collected");
+        }
+      }
+
+      // Modal functions for actions
+      function approveClaimFromModal(id) {
+        approveClaim(id, true);
+      }
+      function rejectClaimFromModal(id) {
+        rejectClaim(id, true);
+      }
+      function markCollectedFromModal(id) {
+        markCollected(id, true);
+      }
+
+      async function deleteLostId(id) {
+        if (
+          !confirm(
+            "Are you sure you want to delete this lost ID? This action cannot be undone."
+          )
+        ) {
+          return;
+        }
+
+        try {
+          await apiCall(`/lost-ids/${id}`, { method: "DELETE" });
+          showAlert("success", "Lost ID deleted successfully!");
+          loadLostIds();
+        } catch (error) {
+          showAlert("error", "Failed to delete lost ID");
+        }
+      }
+
+      // Export function - updated for HTTP-only cookies
+      async function exportData() {
+        try {
+          const type = document.getElementById("exportType").value;
+          const startDate = document.getElementById("exportStartDate").value;
+          const endDate = document.getElementById("exportEndDate").value;
+
+          const params = new URLSearchParams({ type });
+          if (startDate) params.append("start_date", startDate);
+          if (endDate) params.append("end_date", endDate);
+
+          const response = await fetch(`${API_BASE_URL}/export/csv?${params}`, {
+            credentials: "include", // Include HTTP-only cookies
+          });
+
+          if (!response.ok) throw new Error("Export failed");
+
+          const blob = await response.blob();
+          const url = window.URL.createObjectURL(blob);
+          const a = document.createElement("a");
+          a.style.display = "none";
+          a.href = url;
+          a.download = `${type}_export_${
+            new Date().toISOString().split("T")[0]
+          }.csv`;
+          document.body.appendChild(a);
+          a.click();
+          window.URL.revokeObjectURL(url);
+          document.body.removeChild(a);
+
+          showAlert("success", "Data exported successfully!");
+        } catch (error) {
+          showAlert("error", "Failed to export data");
+        }
+      }
+
+      // Pagination
+      function displayPagination(type, pagination) {
+        const paginationDiv = document.getElementById(`${type}Pagination`);
+        const { currentPage, totalPages } = pagination;
+
+        if (totalPages <= 1) {
+          paginationDiv.innerHTML = "";
+          return;
+        }
+
+        let paginationHTML = "";
+
+        // Previous button
+        if (currentPage > 1) {
+          paginationHTML += `<button class="page-btn" onclick="changePage('${type}', ${
+            currentPage - 1
+          })">Previous</button>`;
+        }
+
+        // Page numbers
+        for (
+          let i = Math.max(1, currentPage - 2);
+          i <= Math.min(totalPages, currentPage + 2);
+          i++
+        ) {
+          paginationHTML += `<button class="page-btn ${
+            i === currentPage ? "active" : ""
+          }" onclick="changePage('${type}', ${i})">${i}</button>`;
+        }
+
+        // Next button
+        if (currentPage < totalPages) {
+          paginationHTML += `<button class="page-btn" onclick="changePage('${type}', ${
+            currentPage + 1
+          })">Next</button>`;
+        }
+
+        paginationDiv.innerHTML = paginationHTML;
+      }
+
+      function changePage(type, page) {
+        currentPage[type] = page;
+
+        if (type === "lostIds") {
+          loadLostIds(page);
+        } else if (type === "claims") {
+          loadClaims(page);
+        }
+      }
+
+      // Utility functions
+      function formatIdType(type) {
+        const types = {
+          student_id: "Student ID Card",
+          government_issued: "Government ID",
+          other: "Other ID",
+        };
+        return types[type] || type;
+      }
+
+      function formatStatus(status) {
+        const statuses = {
+          available: "Available",
+          claimed: "Claimed",
+          returned: "Returned",
+          pending: "Pending Review",
+          approved: "Approved",
+          rejected: "Rejected",
+          collected: "Collected",
+        };
+        return statuses[status] || status;
+      }
+
+      function formatDate(dateString) {
+        if (!dateString) return "N/A";
+        return new Date(dateString).toLocaleDateString();
+      }
+
+      function formatDateTime(dateString) {
+        if (!dateString) return "N/A";
+        return new Date(dateString).toLocaleString();
+      }
+
+      function getTimeAgo(dateString) {
+        const now = new Date();
+        const date = new Date(dateString);
+        const diffMs = now - date;
+        const diffMins = Math.floor(diffMs / 60000);
+        const diffHours = Math.floor(diffMins / 60);
+        const diffDays = Math.floor(diffHours / 24);
+
+        if (diffMins < 60) return `${diffMins} minutes ago`;
+        if (diffHours < 24) return `${diffHours} hours ago`;
+        if (diffDays < 7) return `${diffDays} days ago`;
+        return formatDate(dateString);
+      }
+
+      // Alert system
+      function showAlert(type, message) {
+        const alertContainer = document.getElementById("alertContainer");
+        const alertId = "alert-" + Date.now();
+
+        const alertHTML = `
+                <div id="${alertId}" class="alert alert-${type}" style="margin-bottom: 0.5rem; opacity: 0; transform: translateX(100%); transition: all 0.3s ease;">
+                    ${message}
+                    <button onclick="removeAlert('${alertId}')" style="float: right; background: none; border: none; font-weight: bold; cursor: pointer;">&times;</button>
+                </div>
+            `;
+
+        alertContainer.insertAdjacentHTML("afterbegin", alertHTML);
+
+        // Animate in
+        setTimeout(() => {
+          const alert = document.getElementById(alertId);
+          if (alert) {
+            alert.style.opacity = "1";
+            alert.style.transform = "translateX(0)";
+          }
+        }, 10);
+
+        // Auto remove after 5 seconds
+        setTimeout(() => removeAlert(alertId), 5000);
+      }
+
+      function removeAlert(alertId) {
+        const alert = document.getElementById(alertId);
+        if (alert) {
+          alert.style.opacity = "0";
+          alert.style.transform = "translateX(100%)";
+          setTimeout(() => alert.remove(), 300);
+        }
+      }
+
+      // Modal functions
+      function closeModal() {
+        document.getElementById("detailModal").classList.remove("active");
+      }
+
+      // Close modal when clicking outside
+      document
+        .getElementById("detailModal")
+        .addEventListener("click", function (e) {
+          if (e.target === this) {
+            closeModal();
+          }
+        });
+
+      // Logout function
+      async function logout() {
+         try {
+          const response = await fetch("/admin/logout", {
+            method: "GET", // or "POST" if your server route is POST
+            credentials: "include", // send cookies
+          });
+
+          if (!response.ok) {
+            throw new Error("Failed to logout");
+          }
+
+          // Redirect to login page after logout
+          window.location.href = "/Adminlogin.html";
+        } catch (error) {
+          showAlert(`Logout error: ${error.message}`, "error");
+        }
+      }
+
+      // Edit function placeholder
+      function editLostId(id) {
+        showAlert(
+          "info",
+          "Edit functionality would open a form to modify the lost ID details."
+        );
+      }
+    </script>
+  </body>
+   <footer>UNZA Student Portal/ Copyright 2025 </footer>
 </html>

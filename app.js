@@ -1,6 +1,7 @@
-//Necessary Imports
-//import pool from "./dB/db.js";
+
 import express from "express";
+import helmet from "helmet";
+import rateLimit from "express-rate-limit";
 import cors from "cors";
 import authRoutes from "./routes/authRoutes.js";
 import userRoutes from "./routes/userRoutes.js"
@@ -8,35 +9,46 @@ import path from "path";
 import { fileURLToPath } from "url";
 import cookieParser from "cookie-parser";
 import dotenv from "dotenv"
+import adminRoutes from "./routes/adminRoutes.js";
+
+
 dotenv.config()
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
-const port = 3000;
+const port = process.env.port
+
 app.use(cors());
 app.use(express.json());
 app.use(express.static("public"));
-app.use(express.static("uploads"));
+app.use("/uploads", express.static("uploads"));
+app.use('/ids', express.static('uploads/ids'));
 app.use(cookieParser());
 
-app.use(authRoutes);
-app.use(userRoutes);
+app.use(
+  helmet({
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ["'self'"],
+        scriptSrc: ["'self'", "'unsafe-inline'"],
+        styleSrc: ["'self'", "'unsafe-inline'"],
+      },
+    },
+  })
+);
 
-//Routes
-/*
-app.get("/fetchIds", async (req, res) => {
-  try {
-    const [rows] = await pool.query("SELECT * FROM lost_ids");
-    console.log(rows);
-
-    res.json(rows); //send rows as json back to client
-  } catch (error) {
-    res.status(500).json({ error: "Internal server Error" });
-  }
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // Limit each IP
 });
-*/
+app.use(limiter);
+
+
+app.use(authRoutes);
+app.use('/api/users',userRoutes);
+app.use('/api/admin', adminRoutes);
 
 app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "/public/login.html"));

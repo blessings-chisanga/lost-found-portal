@@ -17,5 +17,13 @@ A **Lost and Found** application designed for university campuses. This app help
 
 - Mysql
 
+**Test Credentials:**
+- User ID: 2021379567
+- Password: 11111111
 
+- Admin: testadmin
+- Password: Admin@123
+
+- Admin: Blessings
+- Password: Admin@123
 

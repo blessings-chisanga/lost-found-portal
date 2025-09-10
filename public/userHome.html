@@ -1,0 +1,976 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Lost ID Recovery System</title>
+    <link rel="stylesheet" href="/userHome.css" />
+  </head>
+  <body>
+    <div class="container">
+      <!-- Header -->
+      <div class="header">
+        <h1>Lost ID Recovery System</h1>
+        <p>
+          Find and claim your lost student ID cards quickly and securely. Browse
+          available IDs, submit claims, and track your recovery progress.
+        </p>
+      </div>
+
+      <!-- Info Banner -->
+      <div class="info-banner">
+        <h3>How to Use This Platform</h3>
+        <ul>
+          <li>
+            <strong>Browse Lost IDs:</strong> Search through available lost ID
+            cards using name, student ID, or keywords
+          </li>
+          <li>
+            <strong>Submit Claims:</strong> Found your ID? Click "Claim This ID"
+            and provide verification details
+          </li>
+          <li>
+            <strong>Track Progress:</strong> Monitor your claims in "My Claims"
+            tab - see status updates and admin notes
+          </li>
+          <li>
+            <strong>Collect Your ID:</strong> Once approved, visit the
+            collection point mentioned in admin notes
+          </li>
+        </ul>
+      </div>
+
+      <!-- Navigation Tabs -->
+      <div class="nav-tabs">
+        <button class="nav-tab active" onclick="switchTab('browse')">
+          Browse Lost IDs
+        </button>
+        <button class="nav-tab" onclick="switchTab('claims')">My Claims</button>
+        <button class="nav-tab" onclick="logoutUser()">Logout</button>
+      </div>
+
+      <!-- Browse Lost IDs Tab -->
+      <div id="browse-tab" class="tab-content active">
+        <div class="search-section">
+          <input
+            type="text"
+            id="search-input"
+            class="search-input"
+            placeholder="Search by name, student ID, or description..."
+          />
+          <select id="id-type-filter" class="filter-select">
+            <option value="all">All ID Types</option>
+          </select>
+          <button class="btn btn-primary" onclick="searchLostIds()">
+            Search
+          </button>
+        </div>
+
+        <div id="lost-ids-container">
+          <div class="loading">Loading lost IDs...</div>
+        </div>
+
+        <div id="browse-pagination" class="pagination"></div>
+      </div>
+
+      <!-- My Claims Tab -->
+      <div id="claims-tab" class="tab-content">
+        <div style="margin-bottom: 20px">
+          <select
+            id="claims-status-filter"
+            class="filter-select"
+            style="max-width: 200px"
+            onchange="loadMyClaims()"
+          >
+            <option value="all">All Claims</option>
+            <option value="pending">Pending</option>
+            <option value="approved">Approved</option>
+            <option value="rejected">Rejected</option>
+            <option value="collected">Collected</option>
+          </select>
+        </div>
+
+        <div id="claims-container">
+          <div class="loading">Loading your claims...</div>
+        </div>
+
+        <div id="claims-pagination" class="pagination"></div>
+      </div>
+    </div>
+
+    <!-- Claim Modal -->
+    <div id="claim-modal" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2>Claim This ID</h2>
+          <button class="close-modal" onclick="closeClaimModal()">
+            &times;
+          </button>
+        </div>
+
+        <div id="claim-id-details"></div>
+
+        <form id="claim-form">
+          <div class="form-group">
+            <label for="verification-details">Verification Details *</label>
+            <textarea
+              id="verification-details"
+              placeholder="Please provide details that prove this ID belongs to you. For example: date when you lost it, where you lost it, any distinguishing marks on the ID, additional information only the owner would know, etc. (minimum 10 characters)"
+              required
+            ></textarea>
+            <small style="color: #718096"
+              >Provide specific details that only the ID owner would know to
+              help verify your claim.</small
+            >
+          </div>
+
+          <div style="display: flex; gap: 15px; justify-content: flex-end">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              onclick="closeClaimModal()"
+            >
+              Cancel
+            </button>
+            <button type="submit" class="btn btn-primary">Submit Claim</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- ID Details Modal -->
+    <div id="details-modal" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2>ID Details</h2>
+          <button class="close-modal" onclick="closeDetailsModal()">
+            &times;
+          </button>
+        </div>
+        <div id="id-details-content"></div>
+      </div>
+    </div>
+
+    <script>
+      // Configuration
+      const API_BASE = "http://localhost:3000/api/users"; 
+      const ITEMS_PER_PAGE = 10;
+
+      // State management
+      let currentPage = 1;
+      let currentClaimsPage = 1;
+      let currentTab = "browse";
+      let authToken = localStorage.getItem("authToken");
+      // Initialize the app
+      document.addEventListener("DOMContentLoaded", async function () {
+        async function checkLogin() {
+          try {
+            const response = await fetch("/auth/check", {
+              credentials: "include",
+            });
+            if (!response.ok) throw new Error("Not logged in");
+            const data = await response.json();
+            return data.student_id; // this can be used in your frontend
+          } catch (err) {
+            showAlert("Please login to access this system", "error");
+            // Redirect to login page
+            //window.location.href = "/login.html";
+            return null;
+          }
+        }
+
+        const studentId = await checkLogin();
+        if (!studentId) return;
+
+        loadIdTypes();
+        loadLostIds();
+        loadMyClaims();
+
+        // Add search input event listener
+        const searchInput = document.getElementById("search-input");
+        let searchTimeout;
+        searchInput.addEventListener("input", function () {
+          clearTimeout(searchTimeout);
+          searchTimeout = setTimeout(() => {
+            currentPage = 1;
+            loadLostIds();
+          }, 500);
+        });
+
+        // Handle Enter key in search
+        searchInput.addEventListener("keypress", function (e) {
+          if (e.key === "Enter") {
+            searchLostIds();
+          }
+        });
+      });
+
+      // API helper function
+      async function apiCall(endpoint, options = {}) {
+        const config = {
+          headers: {
+            "Content-Type": "application/json",
+            ...options.headers,
+          },
+          credentials: "include",
+          ...options,
+        };
+
+        try {
+          const response = await fetch(`${API_BASE}${endpoint}`, config);
+          const data = await response.json();
+
+          if (!response.ok) {
+            throw new Error(
+              data.error || `HTTP error! status: ${response.status}`
+            );
+          }
+
+          return data;
+        } catch (error) {
+          console.error("API Error:", error);
+
+          if (
+            error.message.includes("401") ||
+            error.message.includes("Unauthorized")
+          ) {
+            showAlert("Session expired. Please login again.", "error");
+            // Redirect to login
+            return;
+          }
+
+          throw error;
+        }
+      }
+
+      // Tab switching
+      function switchTab(tabName) {
+        // Update nav tabs
+        document.querySelectorAll(".nav-tab").forEach((tab) => {
+          tab.classList.remove("active");
+        });
+        event.target.classList.add("active");
+
+        // Update tab content
+        document.querySelectorAll(".tab-content").forEach((content) => {
+          content.classList.remove("active");
+        });
+        document.getElementById(`${tabName}-tab`).classList.add("active");
+
+        currentTab = tabName;
+
+        // Load appropriate data
+        if (tabName === "browse") {
+          if (
+            document.getElementById("lost-ids-container").children.length === 1
+          ) {
+            loadLostIds();
+          }
+        } else if (tabName === "claims") {
+          if (
+            document.getElementById("claims-container").children.length === 1
+          ) {
+            loadMyClaims();
+          }
+        }
+      }
+
+      // Load ID Types for filter
+      async function loadIdTypes() {
+        try {
+          const response = await apiCall("/lost-ids/meta/id-types");
+          const select = document.getElementById("id-type-filter");
+
+          // Clear existing options except "All ID Types"
+          select.innerHTML = '<option value="all">All ID Types</option>';
+
+          response.data.forEach((type) => {
+            const option = document.createElement("option");
+            option.value = type.id_type;
+            option.textContent = `${type.id_type} (${type.count})`;
+            select.appendChild(option);
+          });
+        } catch (error) {
+          console.error("Error loading ID types:", error);
+        }
+      }
+
+      // Load Lost IDs
+      async function loadLostIds(page = 1) {
+        const container = document.getElementById("lost-ids-container");
+        container.innerHTML = '<div class="loading">Loading lost IDs...</div>';
+
+        try {
+          const searchTerm = document
+            .getElementById("search-input")
+            .value.trim();
+          const idType = document.getElementById("id-type-filter").value;
+
+          const params = new URLSearchParams({
+            page: page,
+            limit: ITEMS_PER_PAGE,
+          });
+
+          if (searchTerm) params.append("search", searchTerm);
+          if (idType !== "all") params.append("id_type", idType);
+
+          const response = await apiCall(`/lost-ids?${params}`);
+
+          currentPage = page;
+          displayLostIds(response.data);
+          updatePagination(
+            "browse-pagination",
+            response.pagination,
+            loadLostIds
+          );
+        } catch (error) {
+          container.innerHTML = `<div class="alert alert-error">Error loading lost IDs: ${error.message}</div>`;
+        }
+      }
+
+      // Display Lost IDs
+      function displayLostIds(ids) {
+        const container = document.getElementById("lost-ids-container");
+
+        if (ids.length === 0) {
+          container.innerHTML = `
+                    <div class="empty-state">
+                        <svg fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd"></path>
+                        </svg>
+                        <h3>No Lost IDs Found</h3>
+                        <p>Try adjusting your search criteria or check back later for new lost IDs.</p>
+                    </div>
+                `;
+          return;
+        }
+
+        container.innerHTML = `
+                <div class="id-grid">
+                    ${ids
+                      .map(
+                        (id) => `
+                        <div class="id-card">
+                            <h3>${escapeHtml(id.student_name)}</h3>
+                            <div class="id-info">
+                                <p><strong>Student ID:</strong> ${escapeHtml(
+                                  id.student_id
+                                )}</p>
+                                <p><strong>ID Type:</strong> ${escapeHtml(
+                                  id.id_type
+                                )}</p>
+                                <p><strong>Found Date:</strong> ${formatDate(
+                                  id.found_date
+                                )}</p>
+                                <p><strong>Found Location:</strong> ${escapeHtml(
+                                  id.found_location
+                                )}</p>
+                                ${
+                                  id.description
+                                    ? `<p><strong>Description:</strong> ${escapeHtml(
+                                        id.description
+                                      )}</p>`
+                                    : ""
+                                }
+                            </div>
+                            ${
+                              id.image_url
+                                ? `<img src="${escapeHtml(
+                                    id.image_url
+                                  )}" alt="ID Image" class="id-image" onerror="this.style.display='none'">`
+                                : ""
+                            }
+                            <div style="display: flex; gap: 10px; margin-top: 15px;">
+                                <button class="btn btn-secondary" onclick="showIdDetails(${
+                                  id.id
+                                })">View Details</button>
+                                <button class="btn btn-primary" onclick="openClaimModal(${
+                                  id.id
+                                })">Claim This ID</button>
+                            </div>
+                        </div>
+                    `
+                      )
+                      .join("")}
+                </div>
+            `;
+      }
+
+      // Search function
+      function searchLostIds() {
+        currentPage = 1;
+        loadLostIds();
+      }
+
+      // Show ID Details
+      async function showIdDetails(idId) {
+        try {
+          const response = await apiCall(`/lost-ids/${idId}`);
+          const id = response.data;
+
+          document.getElementById("id-details-content").innerHTML = `
+                    <div class="id-info">
+                        <h3>${escapeHtml(id.student_name)}</h3>
+                        <p><strong>Student ID:</strong> ${escapeHtml(
+                          id.student_id
+                        )}</p>
+                        <p><strong>ID Type:</strong> ${escapeHtml(
+                          id.id_type
+                        )}</p>
+                        <p><strong>Found Date:</strong> ${formatDate(
+                          id.found_date
+                        )}</p>
+                        <p><strong>Found Location:</strong> ${escapeHtml(
+                          id.found_location
+                        )}</p>
+                        ${
+                          id.description
+                            ? `<p><strong>Description:</strong> ${escapeHtml(
+                                id.description
+                              )}</p>`
+                            : ""
+                        }
+                        <p><strong>Added:</strong> ${formatDate(
+                          id.created_at
+                        )}</p>
+                    </div>
+                    ${
+                      id.image_url
+                        ? `<img src="${escapeHtml(
+                            id.image_url
+                          )}" alt="ID Image" class="id-image" style="max-width: 100%;">`
+                        : ""
+                    }
+                    <div style="margin-top: 20px;">
+                        <button class="btn btn-primary" onclick="closeDetailsModal(); openClaimModal(${
+                          id.id
+                        })">Claim This ID</button>
+                    </div>
+                `;
+
+          document.getElementById("details-modal").style.display = "block";
+        } catch (error) {
+          showAlert(`Error loading ID details: ${error.message}`, "error");
+        }
+      }
+
+      // Open Claim Modal
+      async function openClaimModal(idId) {
+        try {
+          const response = await apiCall(`/lost-ids/${idId}`);
+          const id = response.data;
+
+          document.getElementById("claim-id-details").innerHTML = `
+                    <div class="alert alert-warning">
+                        <strong>Claiming ID for:</strong> ${escapeHtml(
+                          id.student_name
+                        )} (${escapeHtml(id.student_id)})
+                    </div>
+                `;
+
+          document.getElementById("claim-form").onsubmit = (e) =>
+            submitClaim(e, idId);
+          document.getElementById("verification-details").value = "";
+          document.getElementById("claim-modal").style.display = "block";
+        } catch (error) {
+          showAlert(`Error: ${error.message}`, "error");
+        }
+      }
+
+      // Submit Claim
+      async function submitClaim(event, idId) {
+        event.preventDefault();
+
+        const verificationDetails = document
+          .getElementById("verification-details")
+          .value.trim();
+
+        if (verificationDetails.length < 10) {
+          showAlert(
+            "Verification details must be at least 10 characters long",
+            "error"
+          );
+          return;
+        }
+
+        try {
+          const submitButton = event.target.querySelector(
+            'button[type="submit"]'
+          );
+          submitButton.disabled = true;
+          submitButton.textContent = "Submitting...";
+
+          await apiCall("/claims", {
+            method: "POST",
+            body: JSON.stringify({
+              lost_id_id: idId,
+              verification_details: verificationDetails,
+            }),
+          });
+
+          closeClaimModal();
+          showAlert(
+            "Claim submitted successfully! Please wait for admin approval.",
+            "success"
+          );
+
+          // Refresh data
+          loadLostIds(currentPage);
+          loadMyClaims(currentClaimsPage);
+        } catch (error) {
+          showAlert(`Error submitting claim: ${error.message}`, "error");
+        } finally {
+          const submitButton = event.target.querySelector(
+            'button[type="submit"]'
+          );
+          submitButton.disabled = false;
+          submitButton.textContent = "Submit Claim";
+        }
+      }
+
+      // Load My Claims
+      async function loadMyClaims(page = 1) {
+        const container = document.getElementById("claims-container");
+        container.innerHTML =
+          '<div class="loading">Loading your claims...</div>';
+
+        try {
+          const status = document.getElementById("claims-status-filter").value;
+
+          const params = new URLSearchParams({
+            page: page,
+            limit: ITEMS_PER_PAGE,
+          });
+
+          if (status !== "all") params.append("status", status);
+
+          const response = await apiCall(`/claims/my-claims?${params}`);
+
+          currentClaimsPage = page;
+          displayClaims(response.data);
+          updatePagination(
+            "claims-pagination",
+            response.pagination,
+            loadMyClaims
+          );
+        } catch (error) {
+          container.innerHTML = `<div class="alert alert-error">Error loading claims: ${error.message}</div>`;
+        }
+      }
+
+      // Display Claims
+      function displayClaims(claims) {
+        const container = document.getElementById("claims-container");
+
+        if (claims.length === 0) {
+          container.innerHTML = `
+                    <div class="empty-state">
+                        <svg fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        <h3>No Claims Found</h3>
+                        <p>You haven't submitted any claims yet. Browse lost IDs to find and claim yours!</p>
+                    </div>
+                `;
+          return;
+        }
+
+        container.innerHTML = `
+                <div class="id-grid">
+                    ${claims
+                      .map(
+                        (claim) => `
+                        <div class="id-card">
+                            <div style="display: flex; justify-content: between; align-items: start; margin-bottom: 15px;">
+                                <h3>${escapeHtml(claim.student_name)}</h3>
+                                <span class="status-badge status-${
+                                  claim.status
+                                }">${claim.status}</span>
+                            </div>
+                            
+                            <div class="id-info">
+                                <p><strong>Student ID:</strong> ${escapeHtml(
+                                  claim.student_id
+                                )}</p>
+                                <p><strong>ID Type:</strong> ${escapeHtml(
+                                  claim.id_type
+                                )}</p>
+                                <p><strong>Claim Date:</strong> ${formatDate(
+                                  claim.claim_date
+                                )}</p>
+                                <p><strong>Found Location:</strong> ${escapeHtml(
+                                  claim.found_location
+                                )}</p>
+                                
+                                ${
+                                  claim.status === "approved"
+                                    ? `
+                                    <div class="alert alert-success" style="margin: 15px 0;">
+                                        <strong>✅ Claim Approved!</strong><br>
+                                        ${
+                                          claim.admin_notes
+                                            ? escapeHtml(claim.admin_notes)
+                                            : "Please contact administration for collection details."
+                                        }
+                                    </div>
+                                `
+                                    : ""
+                                }
+                                
+                                ${
+                                  claim.status === "rejected"
+                                    ? `
+                                    <div class="alert alert-error" style="margin: 15px 0;">
+                                        <strong>❌ Claim Rejected</strong><br>
+                                        ${
+                                          claim.admin_notes
+                                            ? escapeHtml(claim.admin_notes)
+                                            : "Please contact administration for more information."
+                                        }
+                                    </div>
+                                `
+                                    : ""
+                                }
+                                
+                                ${
+                                  claim.status === "collected"
+                                    ? `
+                                    <div class="alert alert-success" style="margin: 15px 0;">
+                                        <strong>✅ ID Collected!</strong><br>
+                                        Collected on: ${formatDate(
+                                          claim.collection_date
+                                        )}
+                                    </div>
+                                `
+                                    : ""
+                                }
+                                
+                                ${
+                                  claim.status === "pending"
+                                    ? `
+                                    <div class="alert alert-warning" style="margin: 15px 0;">
+                                        <strong>⏳ Pending Review</strong><br>
+                                        Your claim is being reviewed by administrators.
+                                    </div>
+                                `
+                                    : ""
+                                }
+                            </div>
+                            
+                            ${
+                              claim.image_url
+                                ? `<img src="${escapeHtml(
+                                    claim.image_url
+                                  )}" alt="ID Image" class="id-image" onerror="this.style.display='none'">`
+                                : ""
+                            }
+                            
+                            <div style="display: flex; gap: 10px; margin-top: 15px; flex-wrap: wrap;">
+                                <button class="btn btn-secondary" onclick="showClaimDetails(${
+                                  claim.id
+                                })">View Details</button>
+                                ${
+                                  claim.status === "pending"
+                                    ? `
+                                    <button class="btn btn-danger" onclick="cancelClaim(${claim.id})">Cancel Claim</button>
+                                `
+                                    : ""
+                                }
+                            </div>
+                        </div>
+                    `
+                      )
+                      .join("")}
+                </div>
+            `;
+      }
+
+      // Show Claim Details
+      async function showClaimDetails(claimId) {
+        try {
+          const response = await apiCall(`/claims/${claimId}`);
+          const claim = response.data;
+
+          document.getElementById("id-details-content").innerHTML = `
+                    <div class="id-info">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                            <h3>Claim Details</h3>
+                            <span class="status-badge status-${claim.status}">${
+            claim.status
+          }</span>
+                        </div>
+                        
+                        <div style="background: #f7fafc; padding: 20px; border-radius: 10px; margin-bottom: 20px;">
+                            <h4 style="margin-bottom: 10px;">ID Information</h4>
+                            <p><strong>Student Name:</strong> ${escapeHtml(
+                              claim.student_name
+                            )}</p>
+                            <p><strong>Student ID:</strong> ${escapeHtml(
+                              claim.student_id
+                            )}</p>
+                            <p><strong>ID Type:</strong> ${escapeHtml(
+                              claim.id_type
+                            )}</p>
+                            <p><strong>Found Date:</strong> ${formatDate(
+                              claim.found_date
+                            )}</p>
+                            <p><strong>Found Location:</strong> ${escapeHtml(
+                              claim.found_location
+                            )}</p>
+                            ${
+                              claim.description
+                                ? `<p><strong>Description:</strong> ${escapeHtml(
+                                    claim.description
+                                  )}</p>`
+                                : ""
+                            }
+                        </div>
+                        
+                        <div style="background: #fff5f5; padding: 20px; border-radius: 10px; margin-bottom: 20px;">
+                            <h4 style="margin-bottom: 10px;">Your Verification Details</h4>
+                            <p>${escapeHtml(claim.verification_details)}</p>
+                        </div>
+                        
+                        <div style="background: #f0fff4; padding: 20px; border-radius: 10px;">
+                            <h4 style="margin-bottom: 10px;">Claim Timeline</h4>
+                            <p><strong>Claim Submitted:</strong> ${formatDate(
+                              claim.claim_date
+                            )}</p>
+                            ${
+                              claim.processed_at
+                                ? `<p><strong>Processed:</strong> ${formatDate(
+                                    claim.processed_at
+                                  )}</p>`
+                                : ""
+                            }
+                            ${
+                              claim.collection_date
+                                ? `<p><strong>Collected:</strong> ${formatDate(
+                                    claim.collection_date
+                                  )}</p>`
+                                : ""
+                            }
+                            
+                            ${
+                              claim.admin_notes
+                                ? `
+                                <div style="margin-top: 15px; padding: 15px; background: white; border-radius: 8px; border-left: 4px solid #4299e1;">
+                                    <strong>Admin Notes:</strong><br>
+                                    ${escapeHtml(claim.admin_notes)}
+                                </div>
+                            `
+                                : ""
+                            }
+                        </div>
+                    </div>
+                    
+                    ${
+                      claim.image_url
+                        ? `<img src="${escapeHtml(
+                            claim.image_url
+                          )}" alt="ID Image" class="id-image" style="max-width: 100%; margin-top: 20px;">`
+                        : ""
+                    }
+                `;
+
+          document.getElementById("details-modal").style.display = "block";
+        } catch (error) {
+          showAlert(`Error loading claim details: ${error.message}`, "error");
+        }
+      }
+
+      // Cancel Claim
+      async function cancelClaim(claimId) {
+        if (
+          !confirm(
+            "Are you sure you want to cancel this claim? This action cannot be undone."
+          )
+        ) {
+          return;
+        }
+
+        try {
+          await apiCall(`/claims/${claimId}`, {
+            method: "DELETE",
+          });
+
+          showAlert("Claim cancelled successfully", "success");
+          loadMyClaims(currentClaimsPage);
+          loadLostIds(currentPage); // Refresh lost IDs as the ID becomes available again
+        } catch (error) {
+          showAlert(`Error cancelling claim: ${error.message}`, "error");
+        }
+      }
+
+      // Modal functions
+      function closeClaimModal() {
+        document.getElementById("claim-modal").style.display = "none";
+      }
+
+      function closeDetailsModal() {
+        document.getElementById("details-modal").style.display = "none";
+      }
+
+      // Close modals when clicking outside
+      window.onclick = function (event) {
+        const claimModal = document.getElementById("claim-modal");
+        const detailsModal = document.getElementById("details-modal");
+
+        if (event.target === claimModal) {
+          closeClaimModal();
+        }
+        if (event.target === detailsModal) {
+          closeDetailsModal();
+        }
+      };
+
+      // Update pagination
+      function updatePagination(containerId, pagination, loadFunction) {
+        const container = document.getElementById(containerId);
+
+        if (!pagination || pagination.totalPages <= 1) {
+          container.innerHTML = "";
+          return;
+        }
+
+        let paginationHTML = "";
+
+        // Previous button
+        if (pagination.currentPage > 1) {
+          paginationHTML += `<button onclick="${loadFunction.name}(${
+            pagination.currentPage - 1
+          })">Previous</button>`;
+        } else {
+          paginationHTML += `<button disabled>Previous</button>`;
+        }
+
+        // Page numbers
+        const startPage = Math.max(1, pagination.currentPage - 2);
+        const endPage = Math.min(
+          pagination.totalPages,
+          pagination.currentPage + 2
+        );
+
+        if (startPage > 1) {
+          paginationHTML += `<button onclick="${loadFunction.name}(1)">1</button>`;
+          if (startPage > 2) {
+            paginationHTML += `<span>...</span>`;
+          }
+        }
+
+        for (let i = startPage; i <= endPage; i++) {
+          if (i === pagination.currentPage) {
+            paginationHTML += `<button class="current-page">${i}</button>`;
+          } else {
+            paginationHTML += `<button onclick="${loadFunction.name}(${i})">${i}</button>`;
+          }
+        }
+
+        if (endPage < pagination.totalPages) {
+          if (endPage < pagination.totalPages - 1) {
+            paginationHTML += `<span>...</span>`;
+          }
+          paginationHTML += `<button onclick="${loadFunction.name}(${pagination.totalPages})">${pagination.totalPages}</button>`;
+        }
+
+        // Next button
+        if (pagination.currentPage < pagination.totalPages) {
+          paginationHTML += `<button onclick="${loadFunction.name}(${
+            pagination.currentPage + 1
+          })">Next</button>`;
+        } else {
+          paginationHTML += `<button disabled>Next</button>`;
+        }
+
+        container.innerHTML = paginationHTML;
+      }
+
+      // Utility functions
+      function escapeHtml(text) {
+        if (!text) return "";
+        const div = document.createElement("div");
+        div.textContent = text;
+        return div.innerHTML;
+      }
+
+      function formatDate(dateString) {
+        if (!dateString) return "";
+        const options = {
+          year: "numeric",
+          month: "short",
+          day: "numeric",
+          hour: "2-digit",
+          minute: "2-digit",
+        };
+        return new Date(dateString).toLocaleDateString("en-US", options);
+      }
+
+      function showAlert(message, type) {
+        // Remove existing alerts
+        const existingAlerts = document.querySelectorAll(".alert");
+        existingAlerts.forEach((alert) => {
+          if (alert.style.position === "fixed") {
+            alert.remove();
+          }
+        });
+
+        // Create new alert
+        const alert = document.createElement("div");
+        alert.className = `alert alert-${type}`;
+        alert.style.position = "fixed";
+        alert.style.top = "20px";
+        alert.style.right = "20px";
+        alert.style.zIndex = "9999";
+        alert.style.maxWidth = "400px";
+        alert.style.boxShadow = "0 4px 20px rgba(0, 0, 0, 0.15)";
+        alert.innerHTML = `
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <span>${escapeHtml(message)}</span>
+                    <button onclick="this.parentElement.parentElement.remove()" style="background: none; border: none; font-size: 18px; cursor: pointer; color: inherit; margin-left: 15px;">&times;</button>
+                </div>
+            `;
+
+        document.body.appendChild(alert);
+
+        // Auto remove after 5 seconds
+        setTimeout(() => {
+          if (alert.parentElement) {
+            alert.remove();
+          }
+        }, 5000);
+      }
+
+      // Handle authentication errors globally
+      window.addEventListener("unhandledrejection", function (event) {
+        if (
+          event.reason &&
+          event.reason.message &&
+          event.reason.message.includes("401")
+        ) {
+          showAlert("Session expired. Please login again.", "error");
+          // You can redirect to login page here
+          // window.location.href = '/login';
+        }
+      });
+      async function logoutUser() {
+        try {
+          const response = await fetch("/logout", {
+            method: "GET", // or "POST" if your server route is POST
+            credentials: "include", // send cookies
+          });
+
+          if (!response.ok) {
+            throw new Error("Failed to logout");
+          }
+
+          // Redirect to login page after logout
+          window.location.href = "/login.html";
+        } catch (error) {
+          showAlert(`Logout error: ${error.message}`, "error");
+        }
+      }
+    </script>
+
+  </body>
+  <footer>UNZA Student Portal/ Copyright 2025 </footer>
+</html>

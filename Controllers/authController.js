@@ -24,6 +24,15 @@ const createToken = (student_id) => {
   });
 };
 
+const createAdminToken = (admin) => {
+  return jwt.sign(
+    { id: admin.id, role: admin.role, username: admin.username },
+    process.env.jwtSecret,
+    { expiresIn: maxAge }
+  );
+};
+
+
 //Signing up a new user
 export async function signup_post(req, res) {
   //middleware executes before this, so input is already saitized at this point
@@ -89,12 +98,12 @@ export async function login_post(req, res) {
       return res.status(400).json({ success: false, message: "Invalid credentials" });
      }
 
-     const token = createToken(student.insertId);
-     res.cookie("jwt", token, { httpOnly: true, maxAge: maxAge * 1000 });
+     const token = createToken(student.student_id);
+     res.cookie("jwt_user", token, { httpOnly: true, maxAge: maxAge * 1000 });
      res.status(200).json({
        success: true,
        message: "Login Successful!",
-       id: student.insertId,
+       id: student.student_id,
      });
 
 
@@ -109,10 +118,63 @@ export async function login_post(req, res) {
 }
 
 export function logout_get(req, res) {
-  res.cookie("jwt", "", { maxAge: 1 }); // Set cookie to expire immediately
+  res.cookie("jwt_user", "", { maxAge: 1 }); // Set cookie to expire immediately
   res.redirect("/login.html");          // Redirect to login page or homepage
 }
 
+//Admin login function
+export async function Adminlogin(req, res) {
+  const { username, password } = req.body;
+
+  try {
+    const [rows] = await pool.execute(
+      "SELECT * FROM admins WHERE username = ? OR email = ?",
+      [username, username]
+    );
+
+    if (rows.length === 0) {
+      return res.status(400).json({ success: false, message: "No such admin found" });
+    }
+
+    const admin = rows[0];
+
+    // Verify password
+    const validPassword = await bcrypt.compare(password, admin.password_hash);
+    if (!validPassword) {
+      return res.status(400).json({ success: false, message: "Invalid credentials" });
+    }
+
+    // Create token with role
+    const token = createAdminToken(admin);
+
+    res.cookie("jwt_admin", token, {
+      httpOnly: true,
+      maxAge: maxAge * 1000,
+      sameSite: "strict",
+      secure: process.env.NODE_ENV === "production", // cookie secure in production
+    });
+
+    res.status(200).json({
+      success: true,
+      message: "Admin login successful",
+      id: admin.id,
+      role: admin.role,
+      full_name: admin.full_name,
+    });
+
+  } catch (error) {
+    console.error("Database error", error.message);
+    res.status(500).json({
+      success: false,
+      message: "Something went wrong while handling the login request",
+    });
+  }
+}
+
+export function Adminlogout(req, res) {
+  res.cookie("jwt_admin", "", { maxAge: 1 }); // Set cookie to expire immediately
+  res.redirect("/Adminlogin.html");          // Redirect to login page or homepage
+}
 
 export default {
   signup_get,
@@ -120,4 +182,6 @@ export default {
   login_get,
   login_post,
   logout_get,
+  Adminlogin,
+  Adminlogout
 };

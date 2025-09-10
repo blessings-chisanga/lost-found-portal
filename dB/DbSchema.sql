@@ -76,7 +76,7 @@ CREATE INDEX idx_students_student_id ON students(student_id);
 
 
 INSERT INTO admins (username, email, password_hash, full_name, role) VALUES
-('Blesings', 'BlessingsChisanga@cs.unza.zm', '$2b$10$hash_here', 'Library Administrator', 'admin');
+('Blessings', 'BlessingsChisanga@cs.unza.zm', '$2a$10$7T3wnHQJLmmHJZAkUwXkWud98K8AF3IupdudvdviGANif2DIwt.hC', 'Library Administrator', 'admin');
 
 INSERT INTO students (student_id, first_name, last_name, email, password_hash) VALUES
 ('2021379566', 'John', 'Doe', 'john.doe@student.edu', '$2b$10$hash_here'),
@@ -85,3 +85,6 @@ INSERT INTO students (student_id, first_name, last_name, email, password_hash) V
 INSERT INTO lost_ids (student_id, student_name, id_type, found_date, found_location, description, status, added_by) VALUES
 ('2021379566', 'John Doe', 'student_id', '2024-06-01', 'Library Reading Room', 'Blue student ID card', 'available', 1),
 ('2021379655', 'Jane Smith', 'government_issued', '2024-06-03', 'Computer Lab', 'Government NRC', 'available', 1);
+
+INSERT INTO admins (username, email, password_hash, full_name, role)
+VALUES ('testadmin', 'admin@example.com', '$2a$10$7T3wnHQJLmmHJZAkUwXkWud98K8AF3IupdudvdviGANif2DIwt.hC', 'Test Admin', 'admin');
