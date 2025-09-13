@@ -135,12 +135,12 @@ npm start
 ## 🔐 Default Login Credentials
 
 ### Admin Access
-- **Username**: `Blessings` or `BlessingsChisanga@cs.unza.zm`
-- **Password**: `password123` (default from schema)
+- **Username**: `testadmin`
+- **Password**: `Admin@123`
 
 ### Test Student Account
-- **Student ID**: `2021379566`
-- **Password**: Use the signup form to create a student account
+- **Student ID**: `2021379567`
+- **Password**: `11111111`
 
 ## 🌐 API Endpoints
 
@@ -324,25 +324,6 @@ DEBUG=app:*
 3. Click "View" to see details
 4. Approve or reject with notes
 5. Mark as collected when student picks up
-
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
-
-## 📝 License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
-
-## 👥 Support
-
-For support or questions:
-- Create an issue in the repository
-- Contact the development team
-- Check the troubleshooting section above
 
 ## 🔄 Updates & Maintenance
 
