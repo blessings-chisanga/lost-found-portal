@@ -5,14 +5,14 @@ body{
   margin: 20px 40px;
   font-size: 1.2rem;
   letter-spacing: 1px;
-  background: #d6e0e9;
+  background: #979797;
 }
 
 h1, h2, h3, h4, ul, li, p, input, label, div, footer{
   margin: 0;
   padding: 0;
   font-family: 'Quicksand', sans-serif;
-  color: #444;
+  color: #3b3a3a;
 }
 
 a {

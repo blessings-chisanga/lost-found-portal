@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <title>Lost Items</title>
+    <title>User Signup</title>
     <link rel="stylesheet" href="/styles.css" />
   </head>
   <body>
@@ -10,9 +10,6 @@
       <h1>UNZA Lost & Found Web Portal</h1>
       <nav>
         <ul>
-          <li>
-            <button><a href="/UserHome.html">home</a></button>
-          </li>
           <li>
             <button><a href="/login.html">log in</a></button>
           </li>
@@ -108,7 +105,7 @@
             console.log("Signup successful:", data.message);
             //form.reset();
             if (data.id) {
-              location.assign("/UserHome.html");
+              location.assign("/userHome.html");
             }
           }
         } catch (error) {

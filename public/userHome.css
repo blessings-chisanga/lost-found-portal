@@ -8,7 +8,7 @@ body {
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
   line-height: 1.6;
   color: #333;
-  background: #d6e0e9;
+  background: #292a2b;
   min-height: 100vh;
 }
 
@@ -47,7 +47,6 @@ body {
   padding: 20px;
   border-radius: 15px;
   margin-bottom: 30px;
-  box-shadow: 0 4px 20px rgba(66, 153, 225, 0.3);
 }
 
 .info-banner h3 {
@@ -258,13 +257,10 @@ body {
 
 .id-image {
   width: 100%;
-  max-width: 200px;
-  height: 120px;
-  max-height: fit-content;
-  object-fit: cover;
-  border-radius: 10px;
-  margin: 15px 0;
-  border: 2px solid #e2e8f0;
+  max-width: 300px;
+  max-height: 200px;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
 }
 
 .status-badge {
@@ -535,3 +531,31 @@ footer{
   color: #808080;
 }
 
+.filter-select {
+    position: relative;
+    z-index: 1;
+    background-color: white;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+    background-position: right 0.5rem center;
+    background-repeat: no-repeat;
+    background-size: 1.5em 1.5em;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    padding-right: 2.5rem;
+}
+
+.search-section {
+    position: relative;
+    z-index: 1;
+}
+
+/* Ensure dropdowns render above other content */
+select {
+    position: relative;
+    z-index: 2;
+}
+
+select:focus {
+    z-index: 10;
+}

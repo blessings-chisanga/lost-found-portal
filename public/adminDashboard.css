@@ -7,7 +7,7 @@
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: #d6e0e9;
+            background: #292a2b;
             color: #333;
         }
 
@@ -65,7 +65,7 @@
         }
 
         .nav-tab.active {
-            background: #a0a9d1;
+            background: #6ab612 ;
             color: white;
         }
 
@@ -375,4 +375,37 @@ footer{
   text-align: center;
   margin-top: 120px;
   color: #808080;
+}
+
+.search-bar select,
+.form-control select,
+select {
+    position: relative;
+    z-index: 1;
+    background-color: white;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+    background-position: right 0.5rem center;
+    background-repeat: no-repeat;
+    background-size: 1.5em 1.5em;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    padding-right: 2.5rem;
+}
+
+/* Fix for all select elements */
+select:focus {
+    position: relative;
+    z-index: 10;
+}
+
+/* Ensure proper stacking context */
+.search-bar {
+    position: relative;
+    z-index: 1;
+}
+
+.form-group {
+    position: relative;
+    z-index: 1;
 }

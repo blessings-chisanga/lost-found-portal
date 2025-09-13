@@ -12,11 +12,10 @@ import dotenv from "dotenv"
 import adminRoutes from "./routes/adminRoutes.js";
 
 
-dotenv.config()
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-
+dotenv.config()
 const app = express();
 const port = process.env.port
 
@@ -43,6 +42,7 @@ const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
   max: 100, // Limit each IP
 });
+
 app.use(limiter);
 
 
@@ -55,5 +55,5 @@ app.get("/", (req, res) => {
 });
 
 app.listen(port, () => {
-  console.log(`Server is listening at port ${port}!`);
+  console.log(`Web Server is listening at port ${port}!`);
 });
