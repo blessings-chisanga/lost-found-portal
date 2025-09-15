@@ -338,6 +338,3 @@ DEBUG=app:*
 - **File uploads**: Weekly backup of uploads directory
 - **Configuration**: Version control all configuration files
 
----
-
-**Built with ❤️ for UNZA Students**
